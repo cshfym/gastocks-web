@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title>GA Stocks Master</title>
+    <script type="text/javascript" src="/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/js/application.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawLineChart);
+    </script>
+</head>
+
+<body>
+
+<!--
+<h1 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1>
+-->
+
+<div id="quote_chart_div" style="width: 1200px; height: 800px;"></div>
+
+<form th:action="@{/logout}" method="post">
+    <div id="results">
+        &nbsp;
+    </div>
+    <input type="submit" value="Sign Out"/>
+</form>
+
+</body>
+</html>
