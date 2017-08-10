@@ -8,7 +8,6 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
       google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(drawLineChart);
     </script>
 </head>
 
@@ -18,14 +17,29 @@
 <h1 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1>
 -->
 
-<div id="quote_chart_div" style="width: 1200px; height: 800px;"></div>
-
-<form th:action="@{/logout}" method="post">
-    <div id="results">
-        &nbsp;
+    <div id="symbolDiv">
+        Symbol:&nbsp;<input id="txtSymbol" value="" style="width: 50px" />
+        <input id="ckSmoothed" type="checkbox" value="Smooth Line" />
     </div>
-    <input type="submit" value="Sign Out"/>
-</form>
+
+    <div id="daysThresholdWrapperDiv">
+        <input id="btn7Days" type="button" value="7 Days" onclick="return ajaxBuildPriceHistory(7);" />
+        <input id="btn30Days" type="button" value="30 Days" onclick="return ajaxBuildPriceHistory(30);" />
+        <input id="btn60Days" type="button" value="60 Days" onclick="return ajaxBuildPriceHistory(60);" />
+        <input id="btn90Days" type="button" value="90 Days" onclick="return ajaxBuildPriceHistory(90);" />
+        <input id="btn180Days" type="button" value="180 Days" onclick="return ajaxBuildPriceHistory(180);" />
+        <input id="btn365Days" type="button" value="365 Days" onclick="return ajaxBuildPriceHistory(365);" />
+        <input id="btnAll" type="button" value="All" onclick="return ajaxBuildPriceHistory();" />
+    </div>
+
+    <div id="quoteChartDiv" style="width: 1200px; height: 800px;"></div>
+
+    <form th:action="@{/logout}" method="post">
+        <div id="results">
+            &nbsp;
+        </div>
+        <input type="submit" value="Sign Out"/>
+    </form>
 
 </body>
 </html>
