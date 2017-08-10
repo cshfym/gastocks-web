@@ -23,19 +23,29 @@ function drawLineChart(quoteData, tradingDaysCount) {
         return
     }
 
+    var emaShort = $("#txtEMAShort").val();
+    var emaLong = $("#txtEMALong").val();
+
     var dataTable = new google.visualization.DataTable();
     dataTable.addColumn('string', 'X');
-    dataTable.addColumn('number', 'Price');
+    dataTable.addColumn('number', 'Closing Price');
+    dataTable.addColumn('number', 'EMA Short (' + emaShort + ')');
+    dataTable.addColumn('number', 'EMA Long (' + emaLong + ')');
 
     var allQuotes = [];
     var minPrice = 99999999999;
     var maxPrice = 0;
 
+    // Calculate EMA's for all potential data points
+    var emaData = buildEMAData(quoteData, emaShort, emaLong);
+
     for (var i = 0; i < quoteData.length; i++) {
         if (i >= tradingDaysCount) { continue; }
         var quoteElement = [];
-        quoteElement.push(quoteData[i].quoteDate);
-        quoteElement.push(quoteData[i].price);
+        quoteElement.push(quoteData[i].quoteDate); // Quote Date
+        quoteElement.push(quoteData[i].price); // Closing Price
+        quoteElement.push(0); // EMA Short
+        quoteElement.push(0); // EMA Long
         allQuotes.push(quoteElement);
         if (quoteData[i].price > maxPrice) { maxPrice = quoteData[i].price; }
         if (quoteData[i].price < minPrice) { minPrice = quoteData[i].price; }
@@ -44,14 +54,13 @@ function drawLineChart(quoteData, tradingDaysCount) {
     allQuotes.reverse();
     dataTable.addRows(allQuotes);
 
-/*
-    var smoothed = 'none';
-    if ($('#ckSmoothed').is(':checked')) {
-        smoothed = 'function';
+    var title = tradingDaysCount + " Days";
+    if (typeof tradingDaysCount == "undefined") {
+        title = "All Available"
     }
-*/
 
     var options = {
+        title: title,
         hAxis: {
             title: 'Date'
         },
@@ -67,7 +76,22 @@ function drawLineChart(quoteData, tradingDaysCount) {
     chart.draw(dataTable, options);
 }
 
+function buildEMAData(quoteData, emaShort, emaLong) {
 
+    for (var i = 0; i < quoteData.length; i++) {
+
+    }
+}
+
+function calculateEMA(price, last, days) {
+    var ema = price * days + last * (1 - days);
+    return ema
+
+    // EMA = Price(t) * k + EMA(y) * (1 – k)
+    // t = today, y = yesterday, N = number of days in EMA, k = 2/(N+1)
+}
+
+/*
 function drawCandlestickChart() {
     $.ajax({
       url: "http://localhost:9981/gastocks-server/quote/MYGN",
@@ -92,3 +116,5 @@ function drawCandlestickChart() {
       }
     });
 }
+
+*/
