@@ -23,29 +23,29 @@ function drawLineChart(quoteData, tradingDaysCount) {
         return
     }
 
-    var emaShort = $("#txtEMAShort").val();
-    var emaLong = $("#txtEMALong").val();
+    var emaShortDays = $("#txtEMAShort").val();
+    var emaLongDays = $("#txtEMALong").val();
 
     var dataTable = new google.visualization.DataTable();
     dataTable.addColumn('string', 'X');
     dataTable.addColumn('number', 'Closing Price');
-    dataTable.addColumn('number', 'EMA Short (' + emaShort + ')');
-    dataTable.addColumn('number', 'EMA Long (' + emaLong + ')');
+    dataTable.addColumn('number', 'EMA Short Days (' + emaShortDays + ')');
+    dataTable.addColumn('number', 'EMA Long Days (' + emaLongDays + ')');
 
     var allQuotes = [];
     var minPrice = 99999999999;
     var maxPrice = 0;
 
     // Calculate EMA's for all potential data points
-    var emaData = buildEMAData(quoteData, emaShort, emaLong);
+    var emaData = buildEMAData(quoteData, emaShortDays, emaLongDays);
 
     for (var i = 0; i < quoteData.length; i++) {
         if (i >= tradingDaysCount) { continue; }
         var quoteElement = [];
         quoteElement.push(quoteData[i].quoteDate); // Quote Date
         quoteElement.push(quoteData[i].price); // Closing Price
-        quoteElement.push(0); // EMA Short
-        quoteElement.push(0); // EMA Long
+        quoteElement.push(emaData[i][0]); // EMA Short
+        quoteElement.push(emaData[i][1]); // EMA Long
         allQuotes.push(quoteElement);
         if (quoteData[i].price > maxPrice) { maxPrice = quoteData[i].price; }
         if (quoteData[i].price < minPrice) { minPrice = quoteData[i].price; }
@@ -76,19 +76,87 @@ function drawLineChart(quoteData, tradingDaysCount) {
     chart.draw(dataTable, options);
 }
 
-function buildEMAData(quoteData, emaShort, emaLong) {
+function buildEMAData(quoteData, emaShortDays, emaLongDays) {
+
+    var emaData = []; // Format: [[short, long][short, long]], i.e. [[12.4, 13.5][12.5, 13.6]]
+
+    quoteData.reverse(); // Reverse to ascending
+
+    // Populate seed EMA data matching quoteData
+    for (var i = 0; i < quoteData.length; i++) { emaData[i] = [0.0, 0.0]; }
+
+    // Not enough quote data to calculate EMA data?
+    if (quoteData.length < (emaLongDays * 1.5)) { return emaData; }
 
     for (var i = 0; i < quoteData.length; i++) {
 
+        var previousDayShortEMA = 0.0;
+        var previousDayLongEMA = 0.0;
+
+        // Do not begin EMA calculations until both short and long are available
+        if (i < (emaLongDays - 1)) { continue; }
+
+        // The first EMA is the average of all values leading up to, including current quote day.
+        // i.e. - 12 days, the first 12 are averaged for the day 12 EMA.
+
+        if (previousDayShortEMA == 0.0) {
+            var startIndex = (i - emaShortDays) + 1;
+            previousDayShortEMA = calculateAverageToWithIndex(quoteData, startIndex, i);
+        } else {
+            previousDayShortEMA = emaData[i-1][1];
+        }
+
+        if (i == (emaLongDays - 1)) {
+            var startIndex = (i - emaLongDays) + 1;
+            previousDayLongEMA = calculateAverageToWithIndex(quoteData, startIndex, i);
+        } else {
+            previousDayLongEMA = emaData[i-1][0];
+        }
+
+        var shortEMA = calculateEMA(quoteData[i].price, previousDayShortEMA, emaShortDays);
+        var longEMA = calculateEMA(quoteData[i].price, previousDayLongEMA, emaLongDays);
+
+        emaData[i][0] = shortEMA;
+        emaData[i][1] = longEMA;
     }
+
+    //emaData.reverse();
+
+    return emaData;
 }
 
-function calculateEMA(price, last, days) {
-    var ema = price * days + last * (1 - days);
-    return ema
+/**
+ * Calculates the exponential moving average for the given price, previous EMA, and days
+ * EMA = Price(t) * k + EMA(y) * (1 – k), where t = today, y = yesterday, N = number of days in EMA, k = 2/(N+1)
+**/
+function calculateEMA(currentPrice, previousDayEMA, days) {
+    var k = 2 / (days + 1);
+    var exponentialMovingAverage = (currentPrice * k) + (previousDayEMA * (1 - k));
+    return roundTo(exponentialMovingAverage, 2);
+}
 
-    // EMA = Price(t) * k + EMA(y) * (1 – k)
-    // t = today, y = yesterday, N = number of days in EMA, k = 2/(N+1)
+
+function calculateAverageToWithIndex(data, fromIndex, toIndex) {
+
+    var average = 0.0;
+    var count = 0;
+
+    for (var k = fromIndex; k <= toIndex; k++) {
+        average += data[k].price;
+        count++;
+    }
+
+    average = roundTo((average / count), 2);
+    return average;
+}
+
+function roundTo(n, digits) {
+
+    if (digits === undefined) { digits = 0; }
+
+    var multiplicator = Math.pow(10, digits);
+    n = parseFloat((n * multiplicator).toFixed(11));
+    return +(Math.round(n) / multiplicator).toFixed(2);
 }
 
 /*
