@@ -32,7 +32,7 @@ function drawLineChart(quoteData, tradingDaysCount) {
     dataTable.addColumn('number', 'EMA Short Days (' + emaShortDays + ')');
     dataTable.addColumn('number', 'EMA Long Days (' + emaLongDays + ')');
 
-    var allQuotes = [];
+    var visibleQuotes = [];
     var minPrice = 99999999999;
     var maxPrice = 0;
 
@@ -44,15 +44,18 @@ function drawLineChart(quoteData, tradingDaysCount) {
         var quoteElement = [];
         quoteElement.push(quoteData[i].quoteDate); // Quote Date
         quoteElement.push(quoteData[i].price); // Closing Price
-        quoteElement.push(emaData[i][0]); // EMA Short
-        quoteElement.push(emaData[i][1]); // EMA Long
-        allQuotes.push(quoteElement);
+
+        var emaForDate = getEMAForDate(emaData, quoteData[i].quoteDate)
+        quoteElement.push(emaForDate[1]); // Short
+        quoteElement.push(emaForDate[2]); // Long
+        visibleQuotes.push(quoteElement);
         if (quoteData[i].price > maxPrice) { maxPrice = quoteData[i].price; }
         if (quoteData[i].price < minPrice) { minPrice = quoteData[i].price; }
     }
 
-    allQuotes.reverse();
-    dataTable.addRows(allQuotes);
+    visibleQuotes.reverse();
+
+    dataTable.addRows(visibleQuotes);
 
     var title = tradingDaysCount + " Days";
     if (typeof tradingDaysCount == "undefined") {
@@ -66,8 +69,8 @@ function drawLineChart(quoteData, tradingDaysCount) {
         },
         vAxis: {
             format: 'currency',
-            maxValue: maxPrice + (maxPrice * 0.1),
-            minValue: minPrice - (minPrice * 0.1)
+            maxValue: maxPrice,
+            minValue: minPrice
         },
         curveType: $('#ckSmoothed').is(':checked') ? 'function' : 'none'
     };
@@ -76,78 +79,50 @@ function drawLineChart(quoteData, tradingDaysCount) {
     chart.draw(dataTable, options);
 }
 
-function buildEMAData(quoteData, emaShortDays, emaLongDays) {
+/**
+ * Builds a full EMA data array for all available data, given short and long day parameters.
+**/
+function buildEMAData(data, emaShortDays, emaLongDays) {
 
-    var emaData = []; // Format: [[short, long][short, long]], i.e. [[12.4, 13.5][12.5, 13.6]]
+    var quoteData = copyArray(data);
 
-    quoteData.reverse(); // Reverse to ascending
+    quoteData.reverse();
 
-    // Populate seed EMA data matching quoteData
-    for (var i = 0; i < quoteData.length; i++) { emaData[i] = [0.0, 0.0]; }
-
-    // Not enough quote data to calculate EMA data?
-    if (quoteData.length < (emaLongDays * 1.5)) { return emaData; }
-
+    // Calculate out as much EMA data as possible for both short/long parameters
+    var emaData = []; // Format: [[date, short, long][date, short, long]], i.e. [["2017-08-01", 12.4, 13.5]["2017-08-02", 12.5, 13.6]]
+    for (var i = 0; i < quoteData.length; i++) { emaData[i] = ["", 0.0, 0.0]; }
     for (var i = 0; i < quoteData.length; i++) {
-
-        var previousDayShortEMA = 0.0;
-        var previousDayLongEMA = 0.0;
-
-        // Do not begin EMA calculations until both short and long are available
-        if (i < (emaLongDays - 1)) { continue; }
-
-        // The first EMA is the average of all values leading up to, including current quote day.
-        // i.e. - 12 days, the first 12 are averaged for the day 12 EMA.
-
-        if (previousDayShortEMA == 0.0) {
-            var startIndex = (i - emaShortDays) + 1;
-            previousDayShortEMA = calculateAverageToWithIndex(quoteData, startIndex, i);
+        emaData[i][0] = quoteData[i].quoteDate;
+        // Set zero index (oldest quote) EMA equal to quote date
+        if (i == 0) {
+            emaData[i][1] = quoteData[i].price;
+            emaData[i][2] = quoteData[i].price;
         } else {
-            previousDayShortEMA = emaData[i-1][1];
+            emaData[i][1] = calculateEMA(quoteData[i].price, emaData[i-1][1], emaShortDays);
+            emaData[i][2] = calculateEMA(quoteData[i].price, emaData[i-1][2], emaLongDays);
         }
-
-        if (i == (emaLongDays - 1)) {
-            var startIndex = (i - emaLongDays) + 1;
-            previousDayLongEMA = calculateAverageToWithIndex(quoteData, startIndex, i);
-        } else {
-            previousDayLongEMA = emaData[i-1][0];
-        }
-
-        var shortEMA = calculateEMA(quoteData[i].price, previousDayShortEMA, emaShortDays);
-        var longEMA = calculateEMA(quoteData[i].price, previousDayLongEMA, emaLongDays);
-
-        emaData[i][0] = shortEMA;
-        emaData[i][1] = longEMA;
     }
-
-    //emaData.reverse();
 
     return emaData;
 }
 
 /**
  * Calculates the exponential moving average for the given price, previous EMA, and days
- * EMA = Price(t) * k + EMA(y) * (1 – k), where t = today, y = yesterday, N = number of days in EMA, k = 2/(N+1)
+ * EMA = (Current price - EMA(previous day)) x multiplier + EMA(previous day)
 **/
 function calculateEMA(currentPrice, previousDayEMA, days) {
-    var k = 2 / (days + 1);
-    var exponentialMovingAverage = (currentPrice * k) + (previousDayEMA * (1 - k));
-    return roundTo(exponentialMovingAverage, 2);
+    var multiplier = 2/(+days + 1);
+    var exponentialMovingAverage = (currentPrice * multiplier) + (previousDayEMA * (1 - multiplier));
+    return roundTo(exponentialMovingAverage, 4);
 }
 
+function getEMAForDate(emaData, date) {
 
-function calculateAverageToWithIndex(data, fromIndex, toIndex) {
-
-    var average = 0.0;
-    var count = 0;
-
-    for (var k = fromIndex; k <= toIndex; k++) {
-        average += data[k].price;
-        count++;
+    for (var i = 0; i < emaData.length; i++) {
+        if (emaData[i][0] == date) {
+            return emaData[i];
+        }
     }
-
-    average = roundTo((average / count), 2);
-    return average;
 }
 
 function roundTo(n, digits) {
@@ -156,8 +131,15 @@ function roundTo(n, digits) {
 
     var multiplicator = Math.pow(10, digits);
     n = parseFloat((n * multiplicator).toFixed(11));
-    return +(Math.round(n) / multiplicator).toFixed(2);
+    return +(Math.round(n) / multiplicator).toFixed(digits);
 }
+
+function copyArray(array) {
+    var newArray = [];
+    for (var z = 0; z < array.length; z++) { newArray.push(array[z]); }
+    return newArray;
+}
+
 
 /*
 function drawCandlestickChart() {
