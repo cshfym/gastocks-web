@@ -34,13 +34,17 @@
     </div>
 
     <div id="daysThresholdWrapperDiv">
+        Trading Days:&nbsp;
         <input id="btn7Days" type="button" value="7 Days" onclick="return ajaxBuildPriceHistory(7);" />
         <input id="btn30Days" type="button" value="30 Days" onclick="return ajaxBuildPriceHistory(30);" />
         <input id="btn60Days" type="button" value="60 Days" onclick="return ajaxBuildPriceHistory(60);" />
         <input id="btn90Days" type="button" value="90 Days" onclick="return ajaxBuildPriceHistory(90);" />
         <input id="btn180Days" type="button" value="180 Days" onclick="return ajaxBuildPriceHistory(180);" />
         <input id="btn365Days" type="button" value="365 Days" onclick="return ajaxBuildPriceHistory(365);" />
-        <input id="btnAll" type="button" value="All" onclick="return ajaxBuildPriceHistory();" />
+        <input id="btnAll" type="button" value="All Available" onclick="return ajaxBuildPriceHistory();" />
+        <br />
+        From Date:&nbsp;<input id="txtFromDate" />&nbsp;&nbsp;To Date:&nbsp;<input id="txtToDate" />&nbsp;&nbsp;
+        <input id="btnFilterDate" type="button" value="Filter" onclick="return ajaxBuildPriceHistory();" />
     </div>
 
     <div id="quoteChartDiv" style="width: 1200px; height: 800px;"></div>

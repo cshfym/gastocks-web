@@ -26,6 +26,9 @@ function drawLineChart(quoteData, tradingDaysCount) {
     var emaShortDays = $("#txtEMAShort").val();
     var emaLongDays = $("#txtEMALong").val();
 
+    var fromDate = Date.parse($("#txtFromDate").val());
+    var toDate = Date.parse($("#txtToDate").val());
+
     var dataTable = new google.visualization.DataTable();
     dataTable.addColumn('string', 'X');
     dataTable.addColumn('number', 'Closing Price');
@@ -40,7 +43,17 @@ function drawLineChart(quoteData, tradingDaysCount) {
     var emaData = buildEMAData(quoteData, emaShortDays, emaLongDays);
 
     for (var i = 0; i < quoteData.length; i++) {
+
         if (i >= tradingDaysCount) { continue; }
+
+        // Quote date fall within user-specified date window?
+        var quoteDate = Date.parse(quoteData[i].quoteDate);
+        if ((isNaN(fromDate) == false) && (isNaN(toDate) == false)) {
+            if ((quoteDate < fromDate) || (quoteDate > toDate)) {
+            continue;
+            }
+        }
+
         var quoteElement = [];
         quoteElement.push(quoteData[i].quoteDate); // Quote Date
         quoteElement.push(quoteData[i].price); // Closing Price
