@@ -4,11 +4,14 @@
 <head>
     <title>GA Stocks Master</title>
     <script type="text/javascript" src="/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/js/jquery-ui-1.12.1.min.js"></script>
     <script type="text/javascript" src="/js/application.js"></script>
+    <script type="text/javascript" src="/js/charts.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
       google.charts.load('current', {'packages':['corechart']});
     </script>
+    <link rel="stylesheet" href="/css/jquery-ui-1.12.1.min.css" />
 </head>
 
 <body>
@@ -18,8 +21,9 @@
 -->
 
     <div id="symbolDiv">
-        Symbol:&nbsp;<input id="txtSymbol" value="MYGN" style="width: 100px" />
+        Symbol:&nbsp;<input id="txtSymbol" name="symbol" value="" style="width: 100px" />
     </div>
+
     <div id="smoothedDiv">
         Smoothed:&nbsp;<input id="ckSmoothed" type="checkbox" value="Smooth Line" />
     </div>
@@ -47,7 +51,8 @@
         <input id="btnFilterDate" type="button" value="Filter" onclick="return ajaxBuildPriceHistory();" />
     </div>
 
-    <div id="quoteChartDiv" style="width: 1200px; height: 800px;"></div>
+    <div id="quoteChartDiv" style="width: 1200px; height: 400px;"></div>
+    <div id="macdChartDiv" style="width: 1200px; height: 400px;"></div>
 
     <form th:action="@{/logout}" method="post">
         <div id="results">
