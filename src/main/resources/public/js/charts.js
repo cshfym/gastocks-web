@@ -88,7 +88,7 @@ function drawMACDChart(quoteData, tradingDaysCount, emaShortDays, emaLongDays) {
         visibleQuotes.push(quoteElement);
     }
 
-    visibleQuotes.reverse();
+    //visibleQuotes.reverse();
 
     dataTable.addRows(visibleQuotes);
 
@@ -155,7 +155,7 @@ function drawQuoteChart(quoteData, tradingDaysCount, emaShortDays, emaLongDays) 
         if (quoteData[i].price < minPrice) { minPrice = quoteData[i].price; }
     }
 
-    visibleQuotes.reverse();
+    //visibleQuotes.reverse();
 
     dataTable.addRows(visibleQuotes);
 
