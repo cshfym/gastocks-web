@@ -36,7 +36,7 @@ function ajaxBuildPriceHistory(tradingDaysCount) {
     var emaLongDays = $("#txtEMALong").val();
 
       $.ajax({
-            url: "http://localhost:9981/gastocks-server/emaquote/" + symbol + "/" + emaShortDays + "/" + emaLongDays,
+            url: "http://localhost:9981/gastocks-server/technicalquote/" + symbol + "/" + emaShortDays + "/" + emaLongDays,
             cache: true,
             success: function(data) {
               if (data.length == 0) {
@@ -47,7 +47,7 @@ function ajaxBuildPriceHistory(tradingDaysCount) {
               drawMACDChart(data, tradingDaysCount, emaShortDays, emaLongDays);
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-                 alert("Error callixng /quote with symbol [" + symbol + "]");
+                 alert("Error calling /technicalquote with symbol [" + symbol + "]");
                  return [];
               }
        });
