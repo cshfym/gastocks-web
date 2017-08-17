@@ -37,7 +37,7 @@ function ajaxBuildPriceHistory(tradingDaysCount) {
 
       $.ajax({
             url: "http://localhost:9981/gastocks-server/technicalquote/" + symbol + "/" + emaShortDays + "/" + emaLongDays,
-            cache: true,
+            cache: false,
             success: function(data) {
               if (data.length == 0) {
                 alert("No data found!");
@@ -67,6 +67,8 @@ function drawMACDChart(quoteData, tradingDaysCount, emaShortDays, emaLongDays) {
 
     var visibleQuotes = [];
 
+    // Quotes come in descending in order
+
     for (var i = 0; i < quoteData.length; i++) {
 
         if (i >= tradingDaysCount) { continue; }
@@ -88,7 +90,7 @@ function drawMACDChart(quoteData, tradingDaysCount, emaShortDays, emaLongDays) {
         visibleQuotes.push(quoteElement);
     }
 
-    //visibleQuotes.reverse();
+    visibleQuotes.reverse(); // Display ascending
 
     dataTable.addRows(visibleQuotes);
 
@@ -155,7 +157,7 @@ function drawQuoteChart(quoteData, tradingDaysCount, emaShortDays, emaLongDays) 
         if (quoteData[i].price < minPrice) { minPrice = quoteData[i].price; }
     }
 
-    //visibleQuotes.reverse();
+    visibleQuotes.reverse();
 
     dataTable.addRows(visibleQuotes);
 
