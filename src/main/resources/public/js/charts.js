@@ -45,13 +45,38 @@ function ajaxBuildPriceHistory(tradingDaysCount) {
               }
               drawQuoteChart(data, tradingDaysCount, emaShortDays, emaLongDays);
               drawMACDChart(data, tradingDaysCount, emaShortDays, emaLongDays);
+              loadSimulationData(symbol);
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                  alert("Error calling /technicalquote with symbol [" + symbol + "]");
                  return [];
-              }
+             }
        });
 
+}
+
+function loadSimulationData(symbol) {
+
+      $.ajax({
+            url: "http://localhost:9981/gastocks-server/simulation" + "/" + "402881a55dedec14015dedee569e0000" + "/" + symbol + "/transactions",
+            cache: false,
+            success: function(data) {
+              if (data.length == 0) {
+                return;
+              }
+              var out = "";
+              for(var i = 0; i < data.length; i++) {
+                var netProceeds = Math.round((data[i].shares * (data[i].sellPrice - data[i].purchasePrice)) * 100) / 100;
+                out += i + "): Purchase:" + data[i].purchasePrice + " on " + data[i].purchaseDate + ", sell for " + data[i].sellPrice + " on " + data[i].sellDate +
+                    ", net proceeds: $" + netProceeds + "<br />";
+              }
+              $("#divSimulationData").html(out)
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                 alert("Error calling /technicalquote with symbol [" + symbol + "]");
+                 return [];
+             }
+       });
 }
 
 function drawMACDChart(quoteData, tradingDaysCount, emaShortDays, emaLongDays) {
