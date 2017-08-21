@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title>GA Stocks Master :: Simulation</title>
+    <script type="text/javascript" src="/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/js/jquery-ui-1.12.1.min.js"></script>
+    <script type="text/javascript" src="/js/application.js"></script>
+    <script type="text/javascript" src="/js/simulation.js"></script>
+    <!-- <script type="text/javascript" src="/js/charts.js"></script> -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+    </script>
+
+    <!-- Bootstrap -->
+    <link href="/css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <script type="text/javascript" src="/js/bootstrap/bootstrap.min.js"></script>
+
+    <!-- Bootstrap Table -->
+    <link rel="stylesheet" href="/css/bootstrap_table/bootstrap-table.min.css" />
+    <script type="text/javascript" src="/js/bootstrap_table/bootstrap-table.min.js"></script>
+
+    <link rel="stylesheet" href="/css/jquery-ui-1.12.1.min.css" />
+</head>
+
+<body>
+
+<!--
+    <div class="dropdown">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            Simulation
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else here</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#">Separated link</a></li>
+        </ul>
+    </div>
+-->
+    <form id="frmSimulation">
+        <button type="button" class="btn btn-primary" onclick="return loadSimulationData();">Load Simulation</button>
+        <table id="tblSimulation"
+               data-search="true"
+               data-show-refresh="true"
+               data-show-toggle="true"
+               data-show-columns="true"
+               data-show-export="true">
+            <thead>
+            <tr>
+                <th data-field="symbol" data-sortable="true">Symbol</th>
+                <th data-field="net_proceeds" data-sortable="true">Net Proceeds</th>
+                <th data-field="net_proceeds_pct" data-sortable="true">Net Proceeds %</th>
+                <th data-field="gross_proceeds" data-sortable="true">Gross Proceeds</th>
+                <th data-field="gross_proceeds_pct" data-sortable="true">Gross Proceeds %</th>
+            </tr>
+            </thead>
+        </table>
+    </form>
+
+    <form th:action="@{/logout}" method="post">
+        <div id="results">
+            &nbsp;
+        </div>
+        <input type="submit" value="Sign Out"/>
+    </form>
+
+</body>
+</html>

@@ -34,6 +34,7 @@ function ajaxBuildPriceHistory(tradingDaysCount) {
     var symbol = $("#txtSymbol").val();
     var emaShortDays = $("#txtEMAShort").val();
     var emaLongDays = $("#txtEMALong").val();
+    var showEMA = $('#ckShowEMA').is(':checked');
 
       $.ajax({
             url: "http://localhost:9981/gastocks-server/technicalquote/" + symbol + "/" + emaShortDays + "/" + emaLongDays,
@@ -43,7 +44,7 @@ function ajaxBuildPriceHistory(tradingDaysCount) {
                 alert("No data found!");
                 return;
               }
-              drawQuoteChart(data, tradingDaysCount, emaShortDays, emaLongDays);
+              drawQuoteChart(data, tradingDaysCount, showEMA, emaShortDays, emaLongDays);
               drawMACDChart(data, tradingDaysCount, emaShortDays, emaLongDays);
               loadSimulationData(symbol);
             },
@@ -64,19 +65,33 @@ function loadSimulationData(symbol) {
               if (data.length == 0) {
                 return;
               }
-              var out = "";
-              for(var i = 0; i < data.length; i++) {
-                var netProceeds = Math.round((data[i].shares * (data[i].sellPrice - data[i].purchasePrice)) * 100) / 100;
-                out += i + "): Purchase:" + data[i].purchasePrice + " on " + data[i].purchaseDate + ", sell for " + data[i].sellPrice + " on " + data[i].sellDate +
-                    ", net proceeds: $" + netProceeds + "<br />";
-              }
-              $("#divSimulationData").html(out)
+              buildSimulationTable(data);
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                  alert("Error calling /technicalquote with symbol [" + symbol + "]");
                  return [];
              }
        });
+}
+
+function buildSimulationTable(data) {
+    var simulationTable = "<table style='border: 1px solid red;'>";
+    simulationTable += "<tr><th>#</th><th>Shares</th><th>Net Proceeds</th><th>Purchase Price</th><th>Purchase Date</th>" +
+        "<th>Sell Price</th><th>Sell Date</th></tr>";
+    for(var i = 0; i < data.length; i++) {
+        var netProceeds = Math.round(((data[i].shares * (data[i].sellPrice - data[i].purchasePrice)) - data[i].commission) * 100) / 100;
+        simulationTable += "<tr>";
+        simulationTable += "<td>" + (i + 1) + "</td>";
+        simulationTable += "<td>" + data[i].shares + "</td>";
+        simulationTable += "<td>" + netProceeds + "</td>";
+        simulationTable += "<td>" + data[i].purchasePrice + "</td>";
+        simulationTable += "<td>" + data[i].purchaseDate + "</td>";
+        simulationTable += "<td>" + data[i].sellPrice + "</td>";
+        simulationTable += "<td>" + data[i].sellDate + "</td>";
+        simulationTable += "</tr>";
+    }
+    simulationTable += "</table>"
+    $("#divSimulationData").html(simulationTable)
 }
 
 function drawMACDChart(quoteData, tradingDaysCount, emaShortDays, emaLongDays) {
@@ -143,7 +158,7 @@ function drawMACDChart(quoteData, tradingDaysCount, emaShortDays, emaLongDays) {
     chart.draw(dataTable, options);
 }
 
-function drawQuoteChart(quoteData, tradingDaysCount, emaShortDays, emaLongDays) {
+function drawQuoteChart(quoteData, tradingDaysCount, showEMA, emaShortDays, emaLongDays) {
 
     var fromDate = Date.parse($("#txtFromDate").val());
     var toDate = Date.parse($("#txtToDate").val());
@@ -151,8 +166,11 @@ function drawQuoteChart(quoteData, tradingDaysCount, emaShortDays, emaLongDays) 
     var dataTable = new google.visualization.DataTable();
     dataTable.addColumn('string', 'X');
     dataTable.addColumn('number', 'Closing Price');
-    dataTable.addColumn('number', 'EMA Short Days (' + emaShortDays + ')');
-    dataTable.addColumn('number', 'EMA Long Days (' + emaLongDays + ')');
+
+    if (showEMA) {
+        dataTable.addColumn('number', 'EMA Short Days (' + emaShortDays + ')');
+        dataTable.addColumn('number', 'EMA Long Days (' + emaLongDays + ')');
+    }
 
     var visibleQuotes = [];
     var minPrice = 99999999999;
@@ -173,8 +191,11 @@ function drawQuoteChart(quoteData, tradingDaysCount, emaShortDays, emaLongDays) 
         var quoteElement = [];
         quoteElement.push(quoteData[i].quoteDate); // Quote Date
         quoteElement.push(quoteData[i].price); // Closing Price
-        quoteElement.push(quoteData[i].emaShort); // EMA Short
-        quoteElement.push(quoteData[i].emaLong); // EMA Long
+
+        if (showEMA) {
+            quoteElement.push(quoteData[i].emaShort); // EMA Short
+            quoteElement.push(quoteData[i].emaLong); // EMA Long
+        }
 
         visibleQuotes.push(quoteElement);
 

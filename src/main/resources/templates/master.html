@@ -11,6 +11,15 @@
     <script type="text/javascript">
       google.charts.load('current', {'packages':['corechart']});
     </script>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css" />
+    <script type="text/javascript" src="/js/bootstrap/bootstrap.min.js"></script>
+
+    <!-- Bootstrap Table -->
+    <link rel="stylesheet" href="/css/bootstrap_table/bootstrap-table.min.css" />
+    <script type="text/javascript" src="/js/bootstrap_table/bootstrap-table.min.js"></script>
+
     <link rel="stylesheet" href="/css/jquery-ui-1.12.1.min.css" />
 </head>
 
@@ -34,7 +43,7 @@
         &nbsp;&nbsp;
         EMA Long:&nbsp;<input id="txtEMALong" value="26" style="width: 50px;" />
         &nbsp;&nbsp;
-        <input type="button" value="Test" onclick="return calculateEMA(18.0100, 18.5720, 12);" />
+        <label for="ckShowEMA">Show EMA?</label>:&nbsp;<input id="ckShowEMA" type="checkbox" value="Smooth Line" />
     </div>
 
     <div id="daysThresholdWrapperDiv">
@@ -51,9 +60,7 @@
         <input id="btnFilterDate" type="button" value="Filter" onclick="return ajaxBuildPriceHistory();" />
     </div>
 
-    <div id="divSimulationData" style="width: 1200px;">
-
-    </div>
+    <div id="divSimulationData" style="width: 1200px;"></div>
 
     <div id="quoteChartDiv" style="width: 1200px; height: 400px;"></div>
 
