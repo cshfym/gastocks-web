@@ -25,23 +25,16 @@
 
 <body>
 
-<!--
-    <div class="dropdown">
-        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-            Simulation
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-            <li><a href="#">Action</a></li>
-            <li><a href="#">Another action</a></li>
-            <li><a href="#">Something else here</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="#">Separated link</a></li>
-        </ul>
-    </div>
--->
     <form id="frmSimulation">
+        <br/>
+        <select id="ddlSimulationList" onchange="return loadSimulationData();">
+            <option>** Select Simulation **</option>
+        </select>
+        <br/><br/>
         <button type="button" class="btn btn-primary" onclick="return loadSimulationData();">Load Simulation</button>
+
+        <br/><br/>
+        <div id="divSimulationTitle" style="font-size: 1.2em; font-weight: bold;">&nbsp;</div>
         <table id="tblSimulation"
                data-search="true"
                data-show-refresh="true"

@@ -46,7 +46,7 @@ function ajaxBuildPriceHistory(tradingDaysCount) {
               }
               drawQuoteChart(data, tradingDaysCount, showEMA, emaShortDays, emaLongDays);
               drawMACDChart(data, tradingDaysCount, emaShortDays, emaLongDays);
-              loadSimulationData(symbol);
+              // loadSimulationData(symbol);
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                  alert("Error calling /technicalquote with symbol [" + symbol + "]");

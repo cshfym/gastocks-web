@@ -1,12 +1,29 @@
+var SERVER_URL = "http://localhost:9981/gastocks-server";
+var SIMULATIONS_PATH = "/simulations";
+var SIMULATION_SUMMARY_PATH = "/summary"
 
 $(document).ready(function() {
     loadAvailableSimulationsDropDown();
 });
 
 function loadAvailableSimulationsDropDown() {
+    $.ajax({
+        type: "GET",
+        url: SERVER_URL + SIMULATIONS_PATH,
+        dataType: "json",
+        success: function (data) {
+            $.each(data, function(i, object) {
+                var option = "<option value=" + object.id + ">" + object.description + " (" + object.runDate + ")</option>";
+                $(option).appendTo('#ddlSimulationList');
+            });
+        }
+    });
+}
+
+function getSimulationFromServer(id) {
 
     $.ajax({
-        url: "http://localhost:9981/gastocks-server/simulation/402881a55e01e784015e01eec66e0000/summary",
+        url: SERVER_URL + SIMULATIONS_PATH + "/" + id + "/summary",
         cache: false,
         success: function(data) {
 
@@ -16,19 +33,24 @@ function loadAvailableSimulationsDropDown() {
              return [];
          }
     });
-
 }
 
 function loadSimulationData() {
 
+    var selectedSimulationId = $("#ddlSimulationList").val();
+    if (selectedSimulationId.startsWith("**")) {
+        return;
+    }
+
     $.ajax({
-        url: "http://localhost:9981/gastocks-server/simulation/402881a55e01e784015e01eec66e0000/summary",
+        url: SERVER_URL + SIMULATIONS_PATH + "/" + selectedSimulationId + SIMULATION_SUMMARY_PATH,
         cache: false,
         success: function(data) {
           if ((data.length == 0) || (data.symbolSimulationSummaries.length == 0)) {
             alert("No simulation data found!");
             return;
           }
+          $("#divSimulationTitle").html(data.description + " (" + data.runDate + ")");
           var simulationData = [];
           var simulationSummaries = data.symbolSimulationSummaries;
           for(var i = 0; i < simulationSummaries.length; i++) {
