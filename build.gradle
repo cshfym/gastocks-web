@@ -26,6 +26,15 @@ configurations {
 	providedRuntime
 }
 
+springBoot {
+	mainClass = "com.gastocks.gastocksweb.Application"
+}
+
+// Used by 'Spring Boot Gradle Plugin' in combination with 'Devtools' makes HTML/JS/CSS reloadable.
+bootRun {
+	addResources = true
+}
+
 dependencies {
 
 	compile('org.codehaus.groovy:groovy')
@@ -34,6 +43,7 @@ dependencies {
 	compile("org.springframework.boot:spring-boot-starter-thymeleaf")
 
 	runtime('org.springframework.boot:spring-boot-devtools')
+
 	providedRuntime('org.springframework.boot:spring-boot-starter-tomcat')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')

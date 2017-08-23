@@ -3,6 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
     <title>GA Stocks Master</title>
+    <link rel="stylesheet" href="/css/application.css" />
     <script type="text/javascript" src="/js/jquery-3.2.1.min.js"></script>
     <script type="text/javascript" src="/js/jquery-ui-1.12.1.min.js"></script>
     <script type="text/javascript" src="/js/application.js"></script>
@@ -26,52 +27,54 @@
 <body>
 
 <!--
-<h1 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1>
+    <h1 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1>
 -->
+    <div id="divFullScreenWrap" class="full-screen-wrap">
 
-    <div id="symbolDiv">
-        Symbol:&nbsp;<input id="txtSymbol" name="symbol" value="" style="width: 100px" />
-    </div>
+        <div id="divControls">
 
-    <div id="smoothedDiv">
-        Smoothed:&nbsp;<input id="ckSmoothed" type="checkbox" value="Smooth Line" />
-    </div>
+            <div id="divSymbolInput">
+                <label for="txtSymbol">Symbol:</label><input id="txtSymbol" name="symbol" class="input-text" value="" />
+                <label for="btn7Days">Trading Days:</label>
+                <div class="btn-group" role="group">
+                    <button id="btn7Days" onclick="return ajaxBuildPriceHistory(7);" class="btn btn-primary">7 Days</button>
+                    <button id="btn30Days" onclick="return ajaxBuildPriceHistory(30);" class="btn btn-primary">30 Days</button>
+                    <button id="btn60Days" onclick="return ajaxBuildPriceHistory(60);" class="btn btn-primary">60 Days</button>
+                    <button id="btn90Days" onclick="return ajaxBuildPriceHistory(90);" class="btn btn-primary">90 Days</button>
+                    <button id="btn180Days" onclick="return ajaxBuildPriceHistory(180);" class="btn btn-primary">180 Days</button>
+                    <button id="btn365Days" onclick="return ajaxBuildPriceHistory(365);" class="btn btn-primary">365 Days</button>
+                    <button id="btnAll"  class="btn btn-primary" onclick="return ajaxBuildPriceHistory();">All</button>
+                    <label for="txtFromDate">From Date:</label><input id="txtFromDate" class="input-text" />
+                    <label for="txtToDate">To Date:</label><input id="txtToDate" class="input-text" />
+                    <input id="btnFilterDate" type="button" class="btn btn-primary" value="Filter" onclick="return ajaxBuildPriceHistory();" />
+                </div>
+            </div>
 
-    <div id="macdDiv">
-        MACD:&nbsp;&nbsp;
-        EMA Short:&nbsp;<input id="txtEMAShort" value="12" style="width: 50px;" />
-        &nbsp;&nbsp;
-        EMA Long:&nbsp;<input id="txtEMALong" value="26" style="width: 50px;" />
-        &nbsp;&nbsp;
-        <label for="ckShowEMA">Show EMA?</label>:&nbsp;<input id="ckShowEMA" type="checkbox" value="Smooth Line" />
-    </div>
+            <div id="macdDiv">
+                <label for="txtEMAShort">EMA Short:</label><input id="txtEMAShort" value="12" style="width: 50px;" class="input-text" />
+                <label for="txtEMALong">EMA Long:</label><input id="txtEMALong" value="26" style="width: 50px;" class="input-text" />
+                <label for="ckSmoothed">Smoothed:</label><input id="ckSmoothed" type="checkbox" value="Smooth Line" />
+                <label for="ckShowEMA">Show EMA?</label>:&nbsp;<input id="ckShowEMA" type="checkbox" value="Smooth Line" />
+            </div>
 
-    <div id="daysThresholdWrapperDiv">
-        Trading Days:&nbsp;
-        <input id="btn7Days" type="button" value="7 Days" onclick="return ajaxBuildPriceHistory(7);" />
-        <input id="btn30Days" type="button" value="30 Days" onclick="return ajaxBuildPriceHistory(30);" />
-        <input id="btn60Days" type="button" value="60 Days" onclick="return ajaxBuildPriceHistory(60);" />
-        <input id="btn90Days" type="button" value="90 Days" onclick="return ajaxBuildPriceHistory(90);" />
-        <input id="btn180Days" type="button" value="180 Days" onclick="return ajaxBuildPriceHistory(180);" />
-        <input id="btn365Days" type="button" value="365 Days" onclick="return ajaxBuildPriceHistory(365);" />
-        <input id="btnAll" type="button" value="All Available" onclick="return ajaxBuildPriceHistory();" />
-        <br />
-        From Date:&nbsp;<input id="txtFromDate" />&nbsp;&nbsp;To Date:&nbsp;<input id="txtToDate" />&nbsp;&nbsp;
-        <input id="btnFilterDate" type="button" value="Filter" onclick="return ajaxBuildPriceHistory();" />
-    </div>
-
-    <div id="divSimulationData" style="width: 1200px;"></div>
-
-    <div id="quoteChartDiv" style="width: 1200px; height: 400px;"></div>
-
-    <div id="macdChartDiv" style="width: 1200px; height: 400px;"></div>
-
-    <form th:action="@{/logout}" method="post">
-        <div id="results">
-            &nbsp;
         </div>
-        <input type="submit" value="Sign Out"/>
-    </form>
+
+    <!--
+        <div id="divSimulationData" style="width: 1200px;"></div>
+    -->
+
+        <div id="quoteChartDiv" style="width: auto; height: 600px;"></div>
+
+        <div id="macdChartDiv" style="width: autopx; height: 400px;"></div>
+
+        <form th:action="@{/logout}" method="post">
+            <div id="results">
+                &nbsp;
+            </div>
+            <input type="submit" value="Sign Out" class="btn btn-danger" />
+        </form>
+
+    </div>
 
 </body>
 </html>

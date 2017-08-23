@@ -140,12 +140,30 @@ function drawMACDChart(quoteData, tradingDaysCount, emaShortDays, emaLongDays) {
     }
 
     var options = {
+        backgroundColor: '#333333',
+        colors: ['#990a07','blue','yellow'],
+        fontSize: 12,
+        legend: {
+            textStyle: {
+                color: '#e6e6e6'
+            }
+        },
         title: title,
+        titleTextStyle: {
+            color: '#e6e6e6',
+            fontSize: 16
+        },
         hAxis: {
-            title: 'Date'
+            textStyle: {
+                color: '#e6e6e6'
+            }
         },
         vAxis: {
-            format: 'currency'
+            format: 'currency',
+            fontSize: 12,
+            textStyle: {
+                color: '#e6e6e6'
+            }
         },
         curveType: $('#ckSmoothed').is(':checked') ? 'function' : 'none',
         seriesType: 'line',
@@ -213,14 +231,33 @@ function drawQuoteChart(quoteData, tradingDaysCount, showEMA, emaShortDays, emaL
     }
 
     var options = {
+        backgroundColor: '#333333',
+        colors: ['#990a07','blue','yellow'],
+        fontSize: 12,
+        legend: {
+            textStyle: {
+                color: '#e6e6e6'
+            }
+        },
         title: title,
+        titleTextStyle: {
+            color: '#e6e6e6',
+            fontSize: 16
+        },
         hAxis: {
-            title: 'Date'
+            textStyle: {
+                color: '#e6e6e6'
+            }
+
         },
         vAxis: {
             format: 'currency',
             maxValue: maxPrice,
-            minValue: minPrice
+            minValue: minPrice,
+            fontSize: 12,
+            textStyle: {
+                color: '#e6e6e6'
+            }
         },
         curveType: $('#ckSmoothed').is(':checked') ? 'function' : 'none'
     };
