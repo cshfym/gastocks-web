@@ -1,7 +1,15 @@
 
+var SERVER_URL = "http://localhost:9981/gastocks-server";
+var SIMULATIONS_PATH = "/simulations";
+var SIMULATION_SUMMARY_PATH = "/summary"
+var TRANSACTIONS_PATH = "/transactions";
+var TECHNICAL_QUOTE_PATH = "/technicalquote";
+
 $(document).ready(function() {
     console.log("Document ready!");
+    loadAvailableSimulationsDropDown();
     registerSymbolAutoComplete();
+    $("#hfDaysSelected").val("");
 });
 
 function registerSymbolAutoComplete() {
@@ -29,55 +37,110 @@ function registerSymbolAutoComplete() {
     });
 }
 
-function ajaxBuildPriceHistory(tradingDaysCount) {
+function loadAvailableSimulationsDropDown() {
+    $.ajax({
+        type: "GET",
+        url: SERVER_URL + SIMULATIONS_PATH,
+        dataType: "json",
+        success: function (data) {
+            $.each(data, function(i, object) {
+                var option = "<option value=" + object.id + ">" + object.description + " (" + object.runDate + ")</option>";
+                $(option).appendTo('#ddlSimulationList');
+            });
+        }
+    });
+}
+
+function reloadChart() {
+    ajaxBuildAllCharts("Reload");
+}
+
+/**
+ * Primary entrypoint for building all charts. Chains together multiple AJAX calls:
+   #1: Load simulation data.
+   #2: Load basic quote technical data.
+   #3: Load MACD quote data.
+**/
+function ajaxBuildAllCharts(tradingDaysCount) {
+
+    if (tradingDaysCount == undefined) {
+        tradingDaysCount = "99999"; // All
+    }
+
+    if (tradingDaysCount == "Reload") {
+        tradingDaysCount = $("#hfDaysSelected").val();
+    }
 
     var symbol = $("#txtSymbol").val();
+
+    $("#hfDaysSelected").val(tradingDaysCount);
+
+    var selectedSimulationId = $("#ddlSimulationList").val();
+
+    if (selectedSimulationId.startsWith("**")) {
+        // Bypass simulation load, build charts.
+        ajaxBuildQuoteChart(tradingDaysCount, null, symbol);
+    } else {
+
+        // Load simulation data, build charts.
+
+        var fullUrl = SERVER_URL + SIMULATIONS_PATH + "/" + selectedSimulationId + "/" + symbol + TRANSACTIONS_PATH;
+
+        $.ajax({
+            url: fullUrl,
+            cache: false,
+            success: function(data) {
+                if (data.length == 0) {
+                    return [];
+                }
+                buildSimulationTable(data);
+                ajaxBuildQuoteChart(tradingDaysCount, data, symbol);
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                alert("Error calling " + fullUrl + " with symbol [" + symbol + "]");
+                return [];
+             }
+        });
+
+    }
+
+
+}
+
+function ajaxBuildQuoteChart(tradingDaysCount, simulationData, symbol) {
+
     var emaShortDays = $("#txtEMAShort").val();
     var emaLongDays = $("#txtEMALong").val();
     var showEMA = $('#ckShowEMA').is(':checked');
 
-      $.ajax({
-            url: "http://localhost:9981/gastocks-server/technicalquote/" + symbol + "/" + emaShortDays + "/" + emaLongDays,
-            cache: false,
-            success: function(data) {
-              if (data.length == 0) {
-                alert("No data found!");
-                return;
-              }
-              drawQuoteChart(data, tradingDaysCount, showEMA, emaShortDays, emaLongDays);
-              drawMACDChart(data, tradingDaysCount, emaShortDays, emaLongDays);
-              // loadSimulationData(symbol);
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                 alert("Error calling /technicalquote with symbol [" + symbol + "]");
-                 return [];
-             }
-       });
+    var fullUrl = SERVER_URL + TECHNICAL_QUOTE_PATH + "/" +  symbol + "/" + emaShortDays + "/" + emaLongDays;
 
-}
+    $.ajax({
+        url: fullUrl,
+        cache: false,
+        success: function(data) {
+          if (data.length == 0) {
+            alert("No data found!");
+            return;
+          }
 
-function loadSimulationData(symbol) {
-
-      $.ajax({
-            url: "http://localhost:9981/gastocks-server/simulation" + "/" + "402881a55dedec14015dedee569e0000" + "/" + symbol + "/transactions",
-            cache: false,
-            success: function(data) {
-              if (data.length == 0) {
-                return;
-              }
-              buildSimulationTable(data);
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                 alert("Error calling /technicalquote with symbol [" + symbol + "]");
-                 return [];
-             }
-       });
+          drawQuoteChart(data, simulationData, tradingDaysCount, showEMA, emaShortDays, emaLongDays);
+          drawMACDChart(data, simulationData, tradingDaysCount, emaShortDays, emaLongDays);
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+             alert("Error calling /technicalquote with symbol [" + symbol + "]");
+             return [];
+         }
+    });
 }
 
 function buildSimulationTable(data) {
+
     var simulationTable = "<table style='border: 1px solid red;'>";
+
     simulationTable += "<tr><th>#</th><th>Shares</th><th>Net Proceeds</th><th>Purchase Price</th><th>Purchase Date</th>" +
         "<th>Sell Price</th><th>Sell Date</th></tr>";
+
     for(var i = 0; i < data.length; i++) {
         var netProceeds = Math.round(((data[i].shares * (data[i].sellPrice - data[i].purchasePrice)) - data[i].commission) * 100) / 100;
         simulationTable += "<tr>";
@@ -94,7 +157,7 @@ function buildSimulationTable(data) {
     $("#divSimulationData").html(simulationTable)
 }
 
-function drawMACDChart(quoteData, tradingDaysCount, emaShortDays, emaLongDays) {
+function drawMACDChart(quoteData, simulationData, tradingDaysCount, emaShortDays, emaLongDays) {
 
     var fromDate = Date.parse($("#txtFromDate").val());
     var toDate = Date.parse($("#txtToDate").val());
@@ -135,7 +198,7 @@ function drawMACDChart(quoteData, tradingDaysCount, emaShortDays, emaLongDays) {
     dataTable.addRows(visibleQuotes);
 
     var title = tradingDaysCount + " Days";
-    if (typeof tradingDaysCount == "undefined") {
+    if (tradingDaysCount == "99999") {
         title = "All Available"
     }
 
@@ -176,7 +239,7 @@ function drawMACDChart(quoteData, tradingDaysCount, emaShortDays, emaLongDays) {
     chart.draw(dataTable, options);
 }
 
-function drawQuoteChart(quoteData, tradingDaysCount, showEMA, emaShortDays, emaLongDays) {
+function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, emaShortDays, emaLongDays) {
 
     var fromDate = Date.parse($("#txtFromDate").val());
     var toDate = Date.parse($("#txtToDate").val());
@@ -184,6 +247,9 @@ function drawQuoteChart(quoteData, tradingDaysCount, showEMA, emaShortDays, emaL
     var dataTable = new google.visualization.DataTable();
     dataTable.addColumn('string', 'X');
     dataTable.addColumn('number', 'Closing Price');
+    dataTable.addColumn({ type: 'string', role: 'annotation' });
+    dataTable.addColumn({ type: 'string', role: 'annotationText' });
+    dataTable.addColumn({ type: 'boolean', role: 'emphasis' });
 
     if (showEMA) {
         dataTable.addColumn('number', 'EMA Short Days (' + emaShortDays + ')');
@@ -210,6 +276,19 @@ function drawQuoteChart(quoteData, tradingDaysCount, showEMA, emaShortDays, emaL
         quoteElement.push(quoteData[i].quoteDate); // Quote Date
         quoteElement.push(quoteData[i].price); // Closing Price
 
+        // Add BUY or SELL markers on quote line.
+        var transactionType = quoteDateTransactionType(simulationData, quoteData[i].quoteDate);
+        if ((transactionType == "BUY") || (transactionType == "SELL")) {
+            quoteElement.push(transactionType);
+            quoteElement.push(transactionType + " - " + quoteData[i].quoteDate + " at $" + quoteData[i].price);
+        } else {
+            quoteElement.push(null);
+            quoteElement.push(null);
+        }
+
+        // Emphasize (thicker line) if the quote date is within a buy and sell transaction period.
+        isQuoteDateWithinTransactionPeriod(simulationData, quoteData[i].quoteDate) ? quoteElement.push(true) : quoteElement.push(false);
+
         if (showEMA) {
             quoteElement.push(quoteData[i].emaShort); // EMA Short
             quoteElement.push(quoteData[i].emaLong); // EMA Long
@@ -226,13 +305,13 @@ function drawQuoteChart(quoteData, tradingDaysCount, showEMA, emaShortDays, emaL
     dataTable.addRows(visibleQuotes);
 
     var title = tradingDaysCount + " Days";
-    if (typeof tradingDaysCount == "undefined") {
+    if (tradingDaysCount == "99999") {
         title = "All Available"
     }
 
     var options = {
         backgroundColor: '#333333',
-        colors: ['#990a07','blue','yellow'],
+        colors: ['blue','green','#990a07','yellow'],
         fontSize: 12,
         legend: {
             textStyle: {
@@ -259,11 +338,41 @@ function drawQuoteChart(quoteData, tradingDaysCount, showEMA, emaShortDays, emaL
                 color: '#e6e6e6'
             }
         },
-        curveType: $('#ckSmoothed').is(':checked') ? 'function' : 'none'
+        curveType: $('#ckSmoothed').is(':checked') ? 'function' : 'none',
+        seriesType: 'line',
+            series: {
+                2: { color: 'red' }
+            }
     };
 
     var chart = new google.visualization.LineChart(document.getElementById('quoteChartDiv'));
     chart.draw(dataTable, options);
+}
+
+/**
+ * Returns either "BUY" or "SELL" as transaction type if the quote date falls on a simulation buy/sell date.
+**/
+function quoteDateTransactionType(simulationData, quoteDate) {
+
+    if (simulationData == null) { return ""; }
+
+    for(var i = 0; i < simulationData.length; i++) {
+        if (simulationData[i].purchaseDate == quoteDate) {
+            return "BUY";
+        }
+        if (simulationData[i].sellDate == quoteDate) {
+            return "SELL";
+        }
+    }
+
+    return "";
+}
+
+function isQuoteDateWithinTransactionPeriod(simulationData, quoteDate) {
+
+    if (simulationData == null) { return false; }
+
+    // Falls between transaction windows?
 }
 
 /*
