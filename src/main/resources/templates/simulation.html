@@ -30,17 +30,40 @@
         <select id="ddlSimulationList" onchange="return loadSimulationData();">
             <option>** Select Simulation **</option>
         </select>
-        <br/><br/>
+        <!--
         <button type="button" class="btn btn-primary" onclick="return loadSimulationData();">Load Simulation</button>
+        -->
 
         <br/><br/>
         <div id="divSimulationTitle" style="font-size: 1.2em; font-weight: bold;">&nbsp;</div><br />
-        <div id="divSimulationSummary">
-            <label for="spanTotalInvestment">Total Investment:</label>&nbsp;<span id="spanTotalInvestment">$0.00</span><br />
-            <label for="spanNetProceeds">Net Proceeds:</label>&nbsp;<span id="spanNetProceeds">$0.00 (0.0%)</span><br />
-            <label for="spanGrossProceeds">Gross Proceeds:</label>&nbsp;<span id="spanGrossProceeds">$0.00 (0.0%)</span><br />
-            <label for="spanCommissionCost">Commission Cost:</label>&nbsp;<span id="spanCommissionCost">$0.00</span><br />
+
+        <div id="divSimulationSummary" class="panel panel-primary" style="float: left; width: 300px;">
+            <div class="panel-heading">Simulation Summary</div>
+            <div class="panel-body">
+                <label for="spanTotalInvestment">Total Investment:</label>&nbsp;<span id="spanTotalInvestment">$0.00</span><br />
+                <label for="spanNetProceeds">Net Proceeds:</label>&nbsp;<span id="spanNetProceeds">$0.00 (0.0%)</span><br />
+                <label for="spanGrossProceeds">Gross Proceeds:</label>&nbsp;<span id="spanGrossProceeds">$0.00 (0.0%)</span><br />
+                <label for="spanTotalCommissionCost">Total Commission Cost:</label>&nbsp;<span id="spanTotalCommissionCost">$0.00</span><br />
+            </div>
         </div>
+        <div id="divSimulationParametersSummary" class="panel panel-success" style="float: left; margin-left: 25px; width: 300px;">
+            <div class="panel-heading">Simulation Parameters</div>
+            <div class="panel-body">
+                <label for="spanShares">Shares:</label>&nbsp;<span id="spanShares"></span><br />
+                <label for="spanCommissionCost">Commission Cost:</label>&nbsp;<span id="spanCommissionCost"></span><br />
+                <label for="spanMaxPurchasePrice">Max Purchase Price:</label>&nbsp;<span id="spanMaxPurchasePrice"></span><br />
+            </div>
+        </div>
+        <div id="divMacdSummary" class="panel panel-success" style="float: left; margin-left: 25px; width: 300px;">
+            <div class="panel-heading">MACD Parameters</div>
+            <div class="panel-body">
+                <label for="spanMacdPositiveTrigger">MACD Positive Only:</label>&nbsp;<span id="spanMacdPositiveTrigger"></span><br />
+                <label for="spanMacdShortPeriod">MACD Short Period:</label>&nbsp;<span id="spanMacdShortPeriod"></span><br />
+                <label for="spanMacdLongPeriod">MACD Long Period:</label>&nbsp;<span id="spanMacdLongPeriod"></span><br />
+            </div>
+        </div>
+        <div style="clear: both;">&nbsp;</div>
+
         <table id="tblSimulation"
                data-search="true"
                data-show-refresh="true"
@@ -63,9 +86,6 @@
     </form>
 
     <form th:action="@{/logout}" method="post">
-        <div id="results">
-            &nbsp;
-        </div>
         <input type="submit" value="Sign Out"/>
     </form>
 

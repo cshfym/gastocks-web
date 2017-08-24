@@ -1,9 +1,11 @@
+
 var SERVER_URL = "http://localhost:9981/gastocks-server";
 var SIMULATIONS_PATH = "/simulations";
 var SIMULATION_SUMMARY_PATH = "/summary?compact=true"
 
 $(document).ready(function() {
     loadAvailableSimulationsDropDown();
+    resetSimulationData();
 });
 
 function loadAvailableSimulationsDropDown() {
@@ -37,6 +39,8 @@ function getSimulationFromServer(id) {
 
 function loadSimulationData() {
 
+    resetSimulationData();
+
     var selectedSimulationId = $("#ddlSimulationList").val();
     if (selectedSimulationId.startsWith("**")) {
         return;
@@ -66,6 +70,9 @@ function loadSimulationData() {
           }
           setTableData(simulationData);
           setSummaryHeaderLabels(data);
+          setSimulationParameters(data);
+          setParameterLabels(data);
+          setMacdParameterLabels(data);
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
              alert("Error calling /simulation: " + errorThrown);
@@ -74,7 +81,27 @@ function loadSimulationData() {
     });
 }
 
+function resetSimulationData() {
+
+    setTableData([]);
+
+    $("#spanTotalInvestment").html("");
+    $("#spanNetProceeds").html("");
+    $("#spanGrossProceeds").html("");
+    $("#spanTotalCommissionCost").html("");
+    $("#txtSimulationParameters").val("");
+
+    $("#spanDescription").html("");
+    $("#spanShares").html("");
+    $("#spanCommissionCost").html("");
+    $("#spanMaxPurchasePrice").html("");
+    $("#spanMacdPositiveTrigger").html("");
+    $("#spanMacdShortPeriod").html("");
+    $("#spanMacdLongPeriod").html("");
+}
+
 function setTableData(data) {
+    $('#tblSimulation').bootstrapTable("load", data);
     $('#tblSimulation').bootstrapTable({
         data: data
     });
@@ -83,10 +110,31 @@ function setTableData(data) {
 function setSummaryHeaderLabels(data) {
 
     $("#spanTotalInvestment").html("$" + data.totalInvestment);
-    $("#spanNetProceeds").html("$" + data.netProceeds + " (" + data.netProceedsPercentage + "%)");
-    $("#spanGrossProceeds").html("$" + data.grossProceeds + " (" + data.grossProceedsPercentage + "%)");
-    $("#spanCommissionCost").html("$" + data.totalCommissionCost);
+    $("#spanNetProceeds").html(currencyFormatter(data.netProceeds) + " (" + percentageFormatter(data.netProceedsPercentage) + ")");
+    $("#spanGrossProceeds").html(currencyFormatter(data.grossProceeds) + " (" + percentageFormatter(data.grossProceedsPercentage) + ")");
+    $("#spanTotalCommissionCost").html("$" + data.totalCommissionCost);
+}
 
+function setParameterLabels(data) {
+
+    var parameterJson = JSON.parse(data.attributes);
+
+    $("#spanShares").html(parameterJson.shares);
+    $("#spanCommissionCost").html("$" + parameterJson.commissionPrice);
+    $("#spanMaxPurchasePrice").html("$" + parameterJson.maxPurchasePrice);
+}
+
+function setMacdParameterLabels(data) {
+
+    var parameterJson = JSON.parse(data.attributes);
+
+    $("#spanMacdPositiveTrigger").html(parameterJson.macdParameters.macdPositiveTrigger);
+    $("#spanMacdShortPeriod").html(parameterJson.macdParameters.macdShortPeriod);
+    $("#spanMacdLongPeriod").html(parameterJson.macdParameters.macdLongPeriod);
+}
+
+function setSimulationParameters(data) {
+    $("#txtSimulationParameters").val(data.attributes);
 }
 
 function queryParams() {
@@ -103,11 +151,20 @@ function currencyFormatter(value) {
 
     if (value.toString().startsWith("-")) {
         return '<span style="color: red;">-$' + value.toString().replace("-","") + '</span>';
+    } else {
+        return '<span style="color: #3d7532;">$' + value.toString() + '</span>';
     }
 
     return '$' + value;
 }
 
 function percentageFormatter(value) {
+
+    if (value.toString().startsWith("-")) {
+        return '<span style="color: red;">-' + value.toString().replace("-","") + '%</span>';
+    } else {
+        return '<span style="color: #3d7532;">' + value.toString() + '%</span>';
+    }
+
     return value + '%';
 }

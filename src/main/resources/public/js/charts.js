@@ -136,7 +136,7 @@ function ajaxBuildQuoteChart(tradingDaysCount, simulationData, symbol) {
 
 function buildSimulationTable(data) {
 
-    var simulationTable = "<table style='border: 1px solid red;'>";
+    var simulationTable = "<table>";
 
     simulationTable += "<tr><th>#</th><th>Shares</th><th>Net Proceeds</th><th>Purchase Price</th><th>Purchase Date</th>" +
         "<th>Sell Price</th><th>Sell Date</th></tr>";
@@ -169,7 +169,6 @@ function drawMACDChart(quoteData, simulationData, tradingDaysCount, emaShortDays
     dataTable.addColumn({ type: 'string', role: 'annotationText' });
     dataTable.addColumn('number', 'Signal Line');
     dataTable.addColumn('number', 'MACD Hist');
-
 
     var visibleQuotes = [];
 
@@ -219,32 +218,37 @@ function drawMACDChart(quoteData, simulationData, tradingDaysCount, emaShortDays
 
     var options = {
         backgroundColor: '#333333',
-        colors: ['#990a07','blue','yellow'],
         chartArea: {
             width: '90%',
             height: '80%'
         },
+        colors: ['#2286cc','#b73337','yellow'],
+        crosshair: {
+            trigger: 'both',
+            color: '#64f740',
+            opacity: 0.75
+        },
+        curveType: $('#ckSmoothed').is(':checked') ? 'function' : 'none',
         fontSize: 12,
+        hAxis: {
+            textStyle: {
+                color: '#e6e6e6'
+            }
+        },
         legend: {
             textStyle: {
                 color: '#e6e6e6'
             },
             position: 'bottom'
         },
-        crosshair: {
-            trigger: 'both',
-            color: '#64f740',
-            opacity: 0.75
+        seriesType: 'line',
+        series: {
+            2: { type: 'bars' }
         },
         title: title,
         titleTextStyle: {
             color: '#e6e6e6',
             fontSize: 16
-        },
-        hAxis: {
-            textStyle: {
-                color: '#e6e6e6'
-            }
         },
         vAxis: {
             format: 'currency',
@@ -252,11 +256,6 @@ function drawMACDChart(quoteData, simulationData, tradingDaysCount, emaShortDays
             textStyle: {
                 color: '#e6e6e6'
             }
-        },
-        curveType: $('#ckSmoothed').is(':checked') ? 'function' : 'none',
-        seriesType: 'line',
-        series: {
-            2: { type: 'bars' }
         }
     };
 
@@ -274,7 +273,7 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
     dataTable.addColumn('number', 'Closing Price');
     dataTable.addColumn({ type: 'string', role: 'annotation' });
     dataTable.addColumn({ type: 'string', role: 'annotationText' });
-    dataTable.addColumn('number', 'In BUY Position');
+    dataTable.addColumn('number', 'In BUY Position (Simulation)');
     dataTable.addColumn({ type: 'boolean', role: 'emphasis' });
 
     if (showEMA) {
@@ -347,30 +346,35 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
             width: '90%',
             height: '80%'
         },
-        isStacked: true,
-        colors: ['blue','red','#990a07','yellow','red'],
+        colors: ['#2286cc','red','#990a07','yellow','red'],
+        crosshair: {
+            trigger: 'both',
+            color: '#64f740',
+            opacity: 0.75
+        },
+        curveType: $('#ckSmoothed').is(':checked') ? 'function' : 'none',
         fontSize: 12,
+        hAxis: {
+            textStyle: {
+                color: '#e6e6e6'
+            }
+
+        },
+        isStacked: true,
         legend: {
             textStyle: {
                 color: '#e6e6e6'
             },
             position: 'bottom'
         },
-        crosshair: {
-            trigger: 'both',
-            color: '#64f740',
-            opacity: 0.75
+        seriesType: 'line',
+        series: {
+            2: { color: 'red' }
         },
         title: title,
         titleTextStyle: {
             color: '#e6e6e6',
             fontSize: 16
-        },
-        hAxis: {
-            textStyle: {
-                color: '#e6e6e6'
-            }
-
         },
         vAxis: {
             format: 'currency',
@@ -380,11 +384,6 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
             textStyle: {
                 color: '#e6e6e6'
             }
-        },
-        curveType: $('#ckSmoothed').is(':checked') ? 'function' : 'none',
-        seriesType: 'line',
-        series: {
-            2: { color: 'red' }
         }
     };
 
@@ -427,31 +426,3 @@ function isQuoteDateWithinTransactionPeriod(simulationData, quoteDate) {
 
     return false;
 }
-
-/*
-function drawCandlestickChart() {
-    $.ajax({
-      url: "http://localhost:9981/gastocks-server/quote/MYGN",
-      cache: true,
-      success: function(data) {
-        console.log(data);
-        var allQuotes = [];
-        for (var i = 0; i < data.length; i++) {
-          var quoteElement = [];
-          quoteElement.push(data[i].quoteDate);
-          quoteElement.push(data[i].low);
-          quoteElement.push(data[i].price);
-          quoteElement.push(data[i].price);
-          quoteElement.push(data[i].high);
-          console.log(quoteElement);
-          allQuotes.push(quoteElement);
-        }
-        var fullQuoteChart = google.visualization.arrayToDataTable(allQuotes, true);
-        var options = { legend: 'none' };
-        var chart = new google.visualization.CandlestickChart(document.getElementById('quoteChartDiv'));
-        chart.draw(fullQuoteChart, options);
-      }
-    });
-}
-
-*/
