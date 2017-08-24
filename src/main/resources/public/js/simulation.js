@@ -137,6 +137,39 @@ function setSimulationParameters(data) {
     $("#txtSimulationParameters").val(data.attributes);
 }
 
+function createAndSubmitSimulation() {
+
+    if (!confirm("Submit simulation, are you sure?")) { return; }
+
+    var postData = {
+        description: $("#txtSimulationDescription").val(),
+        commissionPrice: $("#txtCommissionCost").val(),
+        shares: $("#txtShares").val(),
+        symbols: [ "MYGN" ],
+        macdParameters: {
+            macdShortPeriod: $("#txtMacdShortPeriod").val(),
+            macdLongPeriod: $("#txtMacdLongPeriod").val(),
+            macdPositiveTrigger: $('#ckMacdPositiveOnly').is(':checked') ? true : false
+        }
+    };
+
+    $.ajax({
+        type: "POST",
+        url: SERVER_URL + SIMULATIONS_PATH,
+        contentType: "application/json",
+        dataType: "json",
+        data: JSON.stringify(postData),
+        success: function (data) {
+            alert("Good to go!");
+            // Clear fields
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            alert("Error calling POST " + SERVER_URL + SIMULATIONS_PATH + ": " + errorThrown);
+            return;
+        }
+    });
+}
+
 function queryParams() {
     return {
         type: 'owner',
