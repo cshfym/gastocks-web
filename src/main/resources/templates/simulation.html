@@ -34,7 +34,13 @@
         <button type="button" class="btn btn-primary" onclick="return loadSimulationData();">Load Simulation</button>
 
         <br/><br/>
-        <div id="divSimulationTitle" style="font-size: 1.2em; font-weight: bold;">&nbsp;</div>
+        <div id="divSimulationTitle" style="font-size: 1.2em; font-weight: bold;">&nbsp;</div><br />
+        <div id="divSimulationSummary">
+            <label for="spanTotalInvestment">Total Investment:</label>&nbsp;<span id="spanTotalInvestment">$0.00</span><br />
+            <label for="spanNetProceeds">Net Proceeds:</label>&nbsp;<span id="spanNetProceeds">$0.00 (0.0%)</span><br />
+            <label for="spanGrossProceeds">Gross Proceeds:</label>&nbsp;<span id="spanGrossProceeds">$0.00 (0.0%)</span><br />
+            <label for="spanCommissionCost">Commission Cost:</label>&nbsp;<span id="spanCommissionCost">$0.00</span><br />
+        </div>
         <table id="tblSimulation"
                data-search="true"
                data-show-refresh="true"
@@ -42,8 +48,7 @@
                data-show-columns="true"
                data-show-export="true"
                data-pagination="true"
-               data-query-params="queryParams"
-               data-height="500">
+               data-query-params="queryParams">
             <thead>
             <tr>
                 <th data-field="symbol" data-sortable="true">Symbol</th>

@@ -1,6 +1,6 @@
 var SERVER_URL = "http://localhost:9981/gastocks-server";
 var SIMULATIONS_PATH = "/simulations";
-var SIMULATION_SUMMARY_PATH = "/summary"
+var SIMULATION_SUMMARY_PATH = "/summary?compact=true"
 
 $(document).ready(function() {
     loadAvailableSimulationsDropDown();
@@ -65,6 +65,7 @@ function loadSimulationData() {
             simulationData.push(symbolData);
           }
           setTableData(simulationData);
+          setSummaryHeaderLabels(data);
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
              alert("Error calling /simulation: " + errorThrown);
@@ -77,6 +78,15 @@ function setTableData(data) {
     $('#tblSimulation').bootstrapTable({
         data: data
     });
+}
+
+function setSummaryHeaderLabels(data) {
+
+    $("#spanTotalInvestment").html("$" + data.totalInvestment);
+    $("#spanNetProceeds").html("$" + data.netProceeds + " (" + data.netProceedsPercentage + "%)");
+    $("#spanGrossProceeds").html("$" + data.grossProceeds + " (" + data.grossProceedsPercentage + "%)");
+    $("#spanCommissionCost").html("$" + data.totalCommissionCost);
+
 }
 
 function queryParams() {
