@@ -165,8 +165,11 @@ function drawMACDChart(quoteData, simulationData, tradingDaysCount, emaShortDays
     var dataTable = new google.visualization.DataTable();
     dataTable.addColumn('string', 'X');
     dataTable.addColumn('number', 'MACD');
+    dataTable.addColumn({ type: 'string', role: 'annotation' });
+    dataTable.addColumn({ type: 'string', role: 'annotationText' });
     dataTable.addColumn('number', 'Signal Line');
     dataTable.addColumn('number', 'MACD Hist');
+
 
     var visibleQuotes = [];
 
@@ -186,9 +189,21 @@ function drawMACDChart(quoteData, simulationData, tradingDaysCount, emaShortDays
 
         var quoteElement = [];
         quoteElement.push(quoteData[i].quoteDate); // Quote Date
+
         quoteElement.push(quoteData[i].macd);
+        // Add BUY or SELL markers on quote line.
+        var transactionType = quoteDateTransactionType(simulationData, quoteData[i].quoteDate);
+        if ((transactionType == "BUY") || (transactionType == "SELL")) {
+            quoteElement.push(transactionType);
+            quoteElement.push(transactionType + " - " + quoteData[i].quoteDate + " at $" + quoteData[i].price);
+        } else {
+            quoteElement.push(null);
+            quoteElement.push(null);
+        }
+
         quoteElement.push(quoteData[i].macdSignalLine);
         quoteElement.push(quoteData[i].macdHist);
+
 
         visibleQuotes.push(quoteElement);
     }
@@ -205,11 +220,21 @@ function drawMACDChart(quoteData, simulationData, tradingDaysCount, emaShortDays
     var options = {
         backgroundColor: '#333333',
         colors: ['#990a07','blue','yellow'],
+        chartArea: {
+            width: '90%',
+            height: '80%'
+        },
         fontSize: 12,
         legend: {
             textStyle: {
                 color: '#e6e6e6'
-            }
+            },
+            position: 'bottom'
+        },
+        crosshair: {
+            trigger: 'both',
+            color: '#64f740',
+            opacity: 0.75
         },
         title: title,
         titleTextStyle: {
@@ -249,6 +274,7 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
     dataTable.addColumn('number', 'Closing Price');
     dataTable.addColumn({ type: 'string', role: 'annotation' });
     dataTable.addColumn({ type: 'string', role: 'annotationText' });
+    dataTable.addColumn('number', 'In BUY Position');
     dataTable.addColumn({ type: 'boolean', role: 'emphasis' });
 
     if (showEMA) {
@@ -287,7 +313,13 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
         }
 
         // Emphasize (thicker line) if the quote date is within a buy and sell transaction period.
-        isQuoteDateWithinTransactionPeriod(simulationData, quoteData[i].quoteDate) ? quoteElement.push(true) : quoteElement.push(false);
+        if (isQuoteDateWithinTransactionPeriod(simulationData, quoteData[i].quoteDate)) {
+            quoteElement.push(quoteData[i].price);
+            quoteElement.push(true);
+        } else {
+            quoteElement.push(null);
+            quoteElement.push(false);
+        }
 
         if (showEMA) {
             quoteElement.push(quoteData[i].emaShort); // EMA Short
@@ -311,12 +343,23 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
 
     var options = {
         backgroundColor: '#333333',
-        colors: ['blue','green','#990a07','yellow'],
+        chartArea: {
+            width: '90%',
+            height: '80%'
+        },
+        isStacked: true,
+        colors: ['blue','red','#990a07','yellow','red'],
         fontSize: 12,
         legend: {
             textStyle: {
                 color: '#e6e6e6'
-            }
+            },
+            position: 'bottom'
+        },
+        crosshair: {
+            trigger: 'both',
+            color: '#64f740',
+            opacity: 0.75
         },
         title: title,
         titleTextStyle: {
@@ -340,9 +383,9 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
         },
         curveType: $('#ckSmoothed').is(':checked') ? 'function' : 'none',
         seriesType: 'line',
-            series: {
-                2: { color: 'red' }
-            }
+        series: {
+            2: { color: 'red' }
+        }
     };
 
     var chart = new google.visualization.LineChart(document.getElementById('quoteChartDiv'));
@@ -372,7 +415,17 @@ function isQuoteDateWithinTransactionPeriod(simulationData, quoteDate) {
 
     if (simulationData == null) { return false; }
 
-    // Falls between transaction windows?
+    var quoteDateObj = new Date(quoteDate);
+
+    for (var i = 0; i < simulationData.length; i++) {
+        var purchaseDate = new Date(simulationData[i].purchaseDate);
+        var sellDate = new Date(simulationData[i].sellDate);
+        if ((quoteDateObj >= purchaseDate) && (quoteDateObj <= sellDate)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /*
