@@ -95,9 +95,21 @@ function resetSimulationData() {
     $("#spanShares").html("");
     $("#spanCommissionCost").html("");
     $("#spanMaxPurchasePrice").html("");
+    $("#spanMinPurchasePrice").html("");
     $("#spanMacdPositiveTrigger").html("");
     $("#spanMacdShortPeriod").html("");
     $("#spanMacdLongPeriod").html("");
+}
+
+function resetSimulationInputs() {
+
+    $("#txtSimulationDescription").val("");
+    $("#txtCommissionCost").val("");
+    $("#txtShares").val("");
+    $("#txtMaxPurchasePrice").val("");
+    $("#txtMinPurchasePrice").val("");
+    $("#txtMacdShortPeriod").val("");
+    $("#txtMacdLongPeriod").val("");
 }
 
 function setTableData(data) {
@@ -109,10 +121,10 @@ function setTableData(data) {
 
 function setSummaryHeaderLabels(data) {
 
-    $("#spanTotalInvestment").html("$" + data.totalInvestment);
+    $("#spanTotalInvestment").html(currencyFormatter(data.totalInvestment));
     $("#spanNetProceeds").html(currencyFormatter(data.netProceeds) + " (" + percentageFormatter(data.netProceedsPercentage) + ")");
     $("#spanGrossProceeds").html(currencyFormatter(data.grossProceeds) + " (" + percentageFormatter(data.grossProceedsPercentage) + ")");
-    $("#spanTotalCommissionCost").html("$" + data.totalCommissionCost);
+    $("#spanTotalCommissionCost").html(currencyFormatter(data.totalCommissionCost));
 }
 
 function setParameterLabels(data) {
@@ -120,8 +132,9 @@ function setParameterLabels(data) {
     var parameterJson = JSON.parse(data.attributes);
 
     $("#spanShares").html(parameterJson.shares);
-    $("#spanCommissionCost").html("$" + parameterJson.commissionPrice);
-    $("#spanMaxPurchasePrice").html("$" + parameterJson.maxPurchasePrice);
+    $("#spanCommissionCost").html(currencyFormatter(parameterJson.commissionPrice));
+    $("#spanMaxPurchasePrice").html(currencyFormatter(parameterJson.maxPurchasePrice));
+    $("#spanMinPurchasePrice").html(currencyFormatter(parameterJson.minPurchasePrice));
 }
 
 function setMacdParameterLabels(data) {
@@ -145,7 +158,9 @@ function createAndSubmitSimulation() {
         description: $("#txtSimulationDescription").val(),
         commissionPrice: $("#txtCommissionCost").val(),
         shares: $("#txtShares").val(),
-        symbols: [ "MYGN" ],
+        symbols: [ ],
+        maxPurchasePrice: $("#txtMaxPurchasePrice").val(),
+        minPurchasePrice: $("#txtMinPurchasePrice").val(),
         macdParameters: {
             macdShortPeriod: $("#txtMacdShortPeriod").val(),
             macdLongPeriod: $("#txtMacdLongPeriod").val(),
@@ -161,7 +176,7 @@ function createAndSubmitSimulation() {
         data: JSON.stringify(postData),
         success: function (data) {
             alert("Good to go!");
-            // Clear fields
+            resetSimulationInputs();
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
             alert("Error calling POST " + SERVER_URL + SIMULATIONS_PATH + ": " + errorThrown);
@@ -182,13 +197,17 @@ function queryParams() {
 
 function currencyFormatter(value) {
 
+    if ((typeof value == "undefined") || (isNaN(value))) {
+        return '<span style="color: red;">N/A</span>'
+    }
+
+    value = value.format(2);
+
     if (value.toString().startsWith("-")) {
         return '<span style="color: red;">-$' + value.toString().replace("-","") + '</span>';
     } else {
         return '<span style="color: #3d7532;">$' + value.toString() + '</span>';
     }
-
-    return '$' + value;
 }
 
 function percentageFormatter(value) {
@@ -198,6 +217,4 @@ function percentageFormatter(value) {
     } else {
         return '<span style="color: #3d7532;">' + value.toString() + '%</span>';
     }
-
-    return value + '%';
 }
