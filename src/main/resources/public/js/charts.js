@@ -79,7 +79,7 @@ function ajaxBuildAllCharts(tradingDaysCount) {
 
     if (selectedSimulationId.startsWith("**")) {
         // Bypass simulation load, build charts.
-        ajaxBuildQuoteChart(tradingDaysCount, null, symbol);
+        ajaxBuildQuoteCharts(tradingDaysCount, null, symbol);
     } else {
 
         // Load simulation data, build charts.
@@ -94,7 +94,7 @@ function ajaxBuildAllCharts(tradingDaysCount) {
                     return [];
                 }
                 buildSimulationTable(data);
-                ajaxBuildQuoteChart(tradingDaysCount, data, symbol);
+                ajaxBuildQuoteCharts(tradingDaysCount, data, symbol);
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                 alert("Error calling " + fullUrl + " with symbol [" + symbol + "]");
@@ -107,7 +107,7 @@ function ajaxBuildAllCharts(tradingDaysCount) {
 
 }
 
-function ajaxBuildQuoteChart(tradingDaysCount, simulationData, symbol) {
+function ajaxBuildQuoteCharts(tradingDaysCount, simulationData, symbol) {
 
     var emaShortDays = $("#txtEMAShort").val();
     var emaLongDays = $("#txtEMALong").val();
@@ -273,8 +273,9 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
     dataTable.addColumn('number', 'Closing Price');
     dataTable.addColumn({ type: 'string', role: 'annotation' });
     dataTable.addColumn({ type: 'string', role: 'annotationText' });
-    dataTable.addColumn('number', 'In BUY Position (Simulation)');
+    dataTable.addColumn('number', 'BUY Position (Simulation)');
     dataTable.addColumn({ type: 'boolean', role: 'emphasis' });
+    dataTable.addColumn('number', '52-Week Average');
 
     if (showEMA) {
         dataTable.addColumn('number', 'EMA Short Days (' + emaShortDays + ')');
@@ -320,6 +321,9 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
             quoteElement.push(false);
         }
 
+        // Averages
+        quoteElement.push(quoteData[i]._52WeekAverage);
+
         if (showEMA) {
             quoteElement.push(quoteData[i].emaShort); // EMA Short
             quoteElement.push(quoteData[i].emaLong); // EMA Long
@@ -346,7 +350,6 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
             width: '90%',
             height: '80%'
         },
-        colors: ['#2286cc','red','#990a07','yellow','red'],
         crosshair: {
             trigger: 'both',
             color: '#64f740',
@@ -369,7 +372,11 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
         },
         seriesType: 'line',
         series: {
-            2: { color: 'red' }
+            0: { color: '#2286cc' },
+            1: { color: 'red' },
+            2: { color: '#cbd1d3', lineDashStyle: [2, 2] },
+            3: { color: 'yellow' },
+            4: { color: 'red' }
         },
         title: title,
         titleTextStyle: {
