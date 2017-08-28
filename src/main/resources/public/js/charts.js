@@ -1,10 +1,4 @@
 
-var SERVER_URL = "http://localhost:9981/gastocks-server";
-var SIMULATIONS_PATH = "/simulations";
-var SIMULATION_SUMMARY_PATH = "/summary"
-var TRANSACTIONS_PATH = "/transactions";
-var TECHNICAL_QUOTE_PATH = "/technicalquote";
-
 $(document).ready(function() {
     console.log("Document ready!");
     loadAvailableSimulationsDropDown();
@@ -15,7 +9,7 @@ $(document).ready(function() {
 function registerSymbolAutoComplete() {
 
     $.ajax({
-        url: "http://localhost:9981/gastocks-server/symbols",
+        url: SERVER_URL + SYMBOLS_PATH,
         cache: true,
         success: function(symbolData) {
           if (symbolData.length == 0) {

@@ -110,6 +110,8 @@ function resetSimulationInputs() {
     $("#txtMinPurchasePrice").val("");
     $("#txtMacdShortPeriod").val("");
     $("#txtMacdLongPeriod").val("");
+    $("#ckSellOpenPositions").attr('checked', false);
+    $("#ckMacdPositiveOnly").attr('checked', false);
 }
 
 function setTableData(data) {
@@ -135,6 +137,7 @@ function setParameterLabels(data) {
     $("#spanCommissionCost").html(currencyFormatter(parameterJson.commissionPrice));
     $("#spanMaxPurchasePrice").html(currencyFormatter(parameterJson.maxPurchasePrice));
     $("#spanMinPurchasePrice").html(currencyFormatter(parameterJson.minPurchasePrice));
+    $("#sellOpenPositions").html(parameterJson.sellOpenPositions);
 }
 
 function setMacdParameterLabels(data) {
@@ -161,6 +164,7 @@ function createAndSubmitSimulation() {
         symbols: [ ],
         maxPurchasePrice: $("#txtMaxPurchasePrice").val(),
         minPurchasePrice: $("#txtMinPurchasePrice").val(),
+        sellOpenPositions: $("#ckSellOpenPositions").is(':checked') ? true : false,
         macdParameters: {
             macdShortPeriod: $("#txtMacdShortPeriod").val(),
             macdLongPeriod: $("#txtMacdLongPeriod").val(),

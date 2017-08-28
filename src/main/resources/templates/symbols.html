@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title>GA Stocks Symbols</title>
+    <link rel="stylesheet" href="/css/application.css" />
+    <script type="text/javascript" src="/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/js/jquery-ui-1.12.1.min.js"></script>
+    <script type="text/javascript" src="/js/application.js"></script>
+    <script type="text/javascript" src="/js/symbols.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+    </script>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css" />
+    <script type="text/javascript" src="/js/bootstrap/bootstrap.min.js"></script>
+
+    <!-- Bootstrap Table -->
+    <link rel="stylesheet" href="/css/bootstrap_table/bootstrap-table.min.css" />
+    <script type="text/javascript" src="/js/bootstrap_table/bootstrap-table.min.js"></script>
+
+    <link rel="stylesheet" href="/css/jquery-ui-1.12.1.min.css" />
+</head>
+
+<body>
+
+    <div id="divFullScreenWrap" class="full-screen-wrap">
+
+        <div id="divControls">
+
+            <div id="divSymbolSelect">
+                <label for="ddlSymbols">Symbol:&nbsp;</label>
+                <select id="ddlSymbols" class="input-text">
+                    <option>** Select Symbol **</option>
+                </select>
+                <button id="btnAdvancedOptions" data-toggle="collapse" data-target="#divAdvancedOptions" class="btn btn-warning">Advanced Options</button>
+            </div>
+
+            <div id="divAdvancedOptions" class="collapse">
+                <label for="txtMin52WeekPrice">Min 52-Week Price:</label>&nbsp;<input id="txtMin52WeekPrice" class="input-xs" /><br />
+                <label for="txtMax52WeekPrice">Max 52-Week Price:</label>&nbsp;<input id="txtMax52WeekPrice" class="input-xs" /><br />
+            </div>
+
+        </div>
+
+        <div id="quoteChartDiv" style="width: 100%; height: 400px;"></div>
+        <div id="macdChartDiv" style="width: 100%; height: 200px;"></div>
+
+    </div>
+
+</body>
+</html>
