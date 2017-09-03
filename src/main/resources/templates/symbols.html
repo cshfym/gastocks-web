@@ -7,6 +7,7 @@
     <script type="text/javascript" src="/js/jquery-3.2.1.min.js"></script>
     <script type="text/javascript" src="/js/jquery-ui-1.12.1.min.js"></script>
     <script type="text/javascript" src="/js/application.js"></script>
+    <script type="text/javascript" src="/js/formatters.js"></script>
     <script type="text/javascript" src="/js/symbols.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
@@ -26,24 +27,34 @@
 
 <body>
 
-    <div id="divFullScreenWrap" class="full-screen-wrap">
+    <div id="divFullScreenWrap" class="full-screen-wrap-white">
 
         <div id="divControls">
-
-            <div id="divSymbolSelect">
-                <label for="ddlSymbols">Symbol:&nbsp;</label>
-                <select id="ddlSymbols" class="input-text">
-                    <option>** Select Symbol **</option>
-                </select>
-                <button id="btnAdvancedOptions" data-toggle="collapse" data-target="#divAdvancedOptions" class="btn btn-warning">Advanced Options</button>
-            </div>
-
-            <div id="divAdvancedOptions" class="collapse">
-                <label for="txtMin52WeekPrice">Min 52-Week Price:</label>&nbsp;<input id="txtMin52WeekPrice" class="input-xs" /><br />
-                <label for="txtMax52WeekPrice">Max 52-Week Price:</label>&nbsp;<input id="txtMax52WeekPrice" class="input-xs" /><br />
-            </div>
-
+            <label for="txtMin52WeekPrice">Min 52-Week Price:</label>&nbsp;<input id="txtMin52WeekPrice" class="input-xs" />&nbsp;&nbsp;
+            <label for="txtMax52WeekPrice">Max 52-Week Price:</label>&nbsp;<input id="txtMax52WeekPrice" class="input-xs" />&nbsp;&nbsp;
+            <button id="btnRefresh" class="btn btn-success" onclick="return loadSymbolDropDown();">Refresh</button>
         </div>
+
+        <table id="tblSymbols"
+               data-search="true"
+               data-show-refresh="true"
+               data-show-toggle="true"
+               data-show-columns="true"
+               data-show-export="true"
+               data-pagination="true"
+               data-query-params="queryParams">
+            <thead>
+            <tr>
+                <th data-field="symbol" data-sortable="true">Symbol</th>
+                <th data-field="description" data-sortable="true">Description</th>
+                <th data-field="exchange_market_short_name" data-sortable="true">Exchange Market</th>
+                <th data-field="min_price" data-sortable="true" data-formatter="currencyFormatter">Minimum Price</th>
+                <th data-field="max_price" data-sortable="true" data-formatter="currencyFormatter">Maximum Price</th>
+                <th data-field="avg_price" data-sortable="true" data-formatter="currencyFormatter">Average Price</th>
+            </tr>
+            </thead>
+        </table>
+
 
         <div id="quoteChartDiv" style="width: 100%; height: 400px;"></div>
         <div id="macdChartDiv" style="width: 100%; height: 200px;"></div>

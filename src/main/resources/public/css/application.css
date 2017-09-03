@@ -1,6 +1,12 @@
-.full-screen-wrap {
+
+.full-screen-wrap-black {
     color: #e6e6e6;
     background-color: #333333;
+}
+
+.full-screen-wrap-white {
+    color: #000;
+    background-color: #fff;
 }
 
 .input-text { color: #000; }
