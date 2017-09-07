@@ -36,7 +36,9 @@ function loadSymbolDropDown() {
                     "exchange_market_short_name": object.exchangeMarketShortName,
                     "min_price": object.minPrice,
                     "max_price": object.maxPrice,
-                    "avg_price": object.avgPrice
+                    "avg_price": object.avgPrice,
+                    "max_price_stdev": object.maxPriceStdev,
+                    "avg_price_stdev": object.avgPriceStdev
                 };
                 symbolTableData.push(symbolData);
             });

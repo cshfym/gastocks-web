@@ -1,4 +1,6 @@
 
+var YAHOO_FINANCE_URL = "https://finance.yahoo.com/quote/";
+
 function currencyFormatter(value) {
 
     if ((typeof value == "undefined") || (isNaN(value))) {
