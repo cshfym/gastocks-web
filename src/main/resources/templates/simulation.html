@@ -1,136 +1,131 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      layout:decorator="template">
+
 <head>
     <title>GA Stocks Master :: Simulation</title>
-    <link rel="stylesheet" href="/css/application.css" />
-    <script type="text/javascript" src="/js/jquery-3.2.1.min.js"></script>
-    <script type="text/javascript" src="/js/jquery-ui-1.12.1.min.js"></script>
-    <script type="text/javascript" src="/js/application.js"></script>
-    <script type="text/javascript" src="/js/formatters.js"></script>
-    <script type="text/javascript" src="/js/simulation.js"></script>
+    <!--
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
       google.charts.load('current', {'packages':['corechart']});
     </script>
-
-    <!-- Bootstrap -->
-    <link href="/css/bootstrap/bootstrap.min.css" rel="stylesheet" />
-    <script type="text/javascript" src="/js/bootstrap/bootstrap.min.js"></script>
-
-    <!-- Bootstrap Table -->
-    <link rel="stylesheet" href="/css/bootstrap_table/bootstrap-table.min.css" />
-    <script type="text/javascript" src="/js/bootstrap_table/bootstrap-table.min.js"></script>
-
-    <link rel="stylesheet" href="/css/jquery-ui-1.12.1.min.css" />
+    -->
+    <script type="text/javascript" src="/js/simulation.js"></script>
 </head>
 
 <body>
 
-    <div id="divViewSimulationWrapper" style="margin: 25px;">
+    <div id="divOuterWrapper" layout:fragment="content" >
 
-        <select id="ddlSimulationList" onchange="return loadSimulationData();">
-            <option>** Select Simulation **</option>
-        </select>
-        <!--
-        <button type="button" class="btn btn-primary" onclick="return loadSimulationData();">Load Simulation</button>
-        -->
+        <div id="divViewSimulationWrapper" class="full-screen-wrap-white">
 
-        <br/><br/>
-        <div id="divSimulationTitle" style="font-size: 1.2em; font-weight: bold;">&nbsp;</div><br />
-
-        <div id="divSimulationSummary" class="panel panel-primary" style="float: left; width: 300px;">
-            <div class="panel-heading">Simulation Summary</div>
-            <div class="panel-body">
-                <label for="spanTotalInvestment">Total Investment:</label>&nbsp;<span id="spanTotalInvestment">$0.00</span><br />
-                <label for="spanNetProceeds">Net Proceeds:</label>&nbsp;<span id="spanNetProceeds">$0.00 (0.0%)</span><br />
-                <label for="spanGrossProceeds">Gross Proceeds:</label>&nbsp;<span id="spanGrossProceeds">$0.00 (0.0%)</span><br />
-                <label for="spanTotalCommissionCost">Total Commission Cost:</label>&nbsp;<span id="spanTotalCommissionCost">$0.00</span><br />
+            <div id="divSimulationControls" class="div-controls">
+                <select id="ddlSimulationList" onchange="return loadSimulationData();">
+                    <option>** Select Simulation **</option>
+                </select>
+                <button type="button" class="btn btn-primary" onclick="return loadSimulationData();">Reload</button>
             </div>
-        </div>
-        <div id="divSimulationParametersSummary" class="panel panel-success float-left-panel">
-            <div class="panel-heading">Simulation Parameters</div>
-            <div class="panel-body">
-                <label for="spanShares">Shares:</label>&nbsp;<span id="spanShares"></span><br />
-                <label for="spanCommissionCost">Commission Cost:</label>&nbsp;<span id="spanCommissionCost"></span><br />
-                <label for="spanMaxPurchasePrice">Max Purchase Price:</label>&nbsp;<span id="spanMaxPurchasePrice"></span><br />
-                <label for="spanMinPurchasePrice">Min Purchase Price:</label>&nbsp;<span id="spanMinPurchasePrice"></span><br />
-                <label for="spanSellOpenPosition">Sell Open Positions:</label>&nbsp;<span id="spanSellOpenPosition"></span><br />
+
+
+            <div id="divSimulationTitle" style="font-size: 1.2em; font-weight: bold;">&nbsp;</div><br />
+
+            <div id="divSimulationSummary" class="panel panel-primary" style="float: left; width: 300px;">
+                <div class="panel-heading">Simulation Summary</div>
+                <div class="panel-body">
+                    <label for="spanTotalInvestment">Total Investment:</label>&nbsp;<span id="spanTotalInvestment">$0.00</span><br />
+                    <label for="spanNetProceeds">Net Proceeds:</label>&nbsp;<span id="spanNetProceeds">$0.00 (0.0%)</span><br />
+                    <label for="spanGrossProceeds">Gross Proceeds:</label>&nbsp;<span id="spanGrossProceeds">$0.00 (0.0%)</span><br />
+                    <label for="spanTotalCommissionCost">Total Commission Cost:</label>&nbsp;<span id="spanTotalCommissionCost">$0.00</span><br />
+                </div>
             </div>
-        </div>
-        <div id="divMacdSummary" class="panel panel-success float-left-panel">
-            <div class="panel-heading">MACD Parameters</div>
-            <div class="panel-body">
-                <label for="spanMacdPositiveTrigger">MACD Positive Only:</label>&nbsp;<span id="spanMacdPositiveTrigger"></span><br />
-                <label for="spanMacdShortPeriod">MACD Short Period:</label>&nbsp;<span id="spanMacdShortPeriod"></span><br />
-                <label for="spanMacdLongPeriod">MACD Long Period:</label>&nbsp;<span id="spanMacdLongPeriod"></span><br />
-            </div>
-        </div>
-        <div style="clear: both;">&nbsp;</div>
-
-        <table id="tblSimulation"
-               data-search="true"
-               data-show-refresh="true"
-               data-show-toggle="true"
-               data-show-columns="true"
-               data-show-export="true"
-               data-pagination="true"
-               data-query-params="queryParams">
-            <thead>
-            <tr>
-                <th data-field="symbol" data-sortable="true">Symbol</th>
-                <th data-field="total_investment" data-sortable="true" data-formatter="currencyFormatter">Total Investment</th>
-                <th data-field="net_proceeds" data-sortable="true" data-formatter="currencyFormatter">Net Proceeds</th>
-                <th data-field="net_proceeds_pct" data-sortable="true" data-formatter="percentageFormatter">Net Proceeds %</th>
-                <th data-field="gross_proceeds" data-sortable="true" data-formatter="currencyFormatter">Gross Proceeds</th>
-                <th data-field="gross_proceeds_pct" data-sortable="true" data-formatter="percentageFormatter">Gross Proceeds %</th>
-            </tr>
-            </thead>
-        </table>
-
-    </div>
-
-    <div id="divCreateSimulationWrapper" style="margin: 25px;">
-        <button id="btnCreateSimulationExpand" data-toggle="collapse" data-target="#divCreateSimulation" class="btn btn-warning">
-            <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-            Show Simulation Create
-        </button>
-        <div id="divCreateSimulation" class="collapse" style="margin-top: 25px;">
-            <div id="divCreateSimulationParameters" class="panel panel-warning float-left-panel" style="width: 600px;">
+            <div id="divSimulationParametersSummary" class="panel panel-success float-left-panel">
                 <div class="panel-heading">Simulation Parameters</div>
                 <div class="panel-body">
-                    <label for="txtSimulationDescription">Description:</label>&nbsp;<input id="txtSimulationDescription" class="input-large" /><br /><br />
-                    <label for="txtShares">Shares:</label>&nbsp;<input id="txtShares" value="100" class="input-xs" /><br />
-                    <label for="txtCommissionCost">Commission Cost:</label>&nbsp;<input id="txtCommissionCost" class="input-xs" value="5.99" /><br />
-                    <label for="txtMaxPurchasePrice">Max Purchase Price:</label>&nbsp;<input id="txtMaxPurchasePrice" class="input-xs" /><br />
-                    <label for="txtMinPurchasePrice">Min Purchase Price:</label>&nbsp;<input id="txtMinPurchasePrice" class="input-xs" /><br />
-                    <label for="ckSellOpenPositions">Sell Open Positions:</label>&nbsp;<input id="ckSellOpenPositions" type="checkbox" /><br />
+                    <label for="spanShares">Shares:</label>&nbsp;<span id="spanShares"></span><br />
+                    <label for="spanCommissionCost">Commission Cost:</label>&nbsp;<span id="spanCommissionCost"></span><br />
+                    <label for="spanMaxPurchasePrice">Max Purchase Price:</label>&nbsp;<span id="spanMaxPurchasePrice"></span><br />
+                    <label for="spanMinPurchasePrice">Min Purchase Price:</label>&nbsp;<span id="spanMinPurchasePrice"></span><br />
+                    <label for="spanSellOpenPosition">Sell Open Positions:</label>&nbsp;<span id="spanSellOpenPosition"></span><br />
                 </div>
             </div>
-
-            <div id="divCreateSimulationSymbols" class="panel panel-warning float-left-panel">
-                <div class="panel-heading">Specific Symbols</div>
-                <div class="panel-body float-panel">
-                    <textarea id="txtSimulationSymbols" style="width: 200px;"></textarea>
-                </div>
-            </div>
-
-            <div id="divCreateMacdParameters" class="panel panel-warning float-left-panel">
+            <div id="divMacdSummary" class="panel panel-success float-left-panel">
                 <div class="panel-heading">MACD Parameters</div>
-                <div class="panel-body float-panel">
-                    <label for="ckMacdPositiveOnly">MACD Positive Only:</label>&nbsp;<input id="ckMacdPositiveOnly" type="checkbox" /><br />
-                    <label for="spanMacdShortPeriod">MACD Short Period:</label>&nbsp;<input id="txtMacdShortPeriod" class="input-xs" value="12" /><br />
-                    <label for="spanMacdLongPeriod">MACD Long Period:</label>&nbsp;<input id="txtMacdLongPeriod" class="input-xs" value="26" /><br />
+                <div class="panel-body">
+                    <label for="spanMacdPositiveTrigger">MACD Positive Only:</label>&nbsp;<span id="spanMacdPositiveTrigger"></span><br />
+                    <label for="spanMacdShortPeriod">MACD Short Period:</label>&nbsp;<span id="spanMacdShortPeriod"></span><br />
+                    <label for="spanMacdLongPeriod">MACD Long Period:</label>&nbsp;<span id="spanMacdLongPeriod"></span><br />
                 </div>
             </div>
-
             <div style="clear: both;">&nbsp;</div>
-            <div id="divSubmit">
-                <button type="button" class="btn btn-primary" onclick="return createAndSubmitSimulation();">Create Simulation</button>
-            </div>
 
+            <table id="tblSimulation"
+                   data-search="true"
+                   data-show-refresh="true"
+                   data-show-toggle="true"
+                   data-show-columns="true"
+                   data-show-export="true"
+                   data-pagination="true"
+                   data-query-params="queryParams">
+                <thead>
+                <tr>
+                    <th data-field="symbol" data-sortable="true">Symbol</th>
+                    <th data-field="total_investment" data-sortable="true" data-formatter="currencyFormatter">Total Investment</th>
+                    <th data-field="net_proceeds" data-sortable="true" data-formatter="currencyFormatter">Net Proceeds</th>
+                    <th data-field="net_proceeds_pct" data-sortable="true" data-formatter="percentageFormatter">Net Proceeds %</th>
+                    <th data-field="gross_proceeds" data-sortable="true" data-formatter="currencyFormatter">Gross Proceeds</th>
+                    <th data-field="gross_proceeds_pct" data-sortable="true" data-formatter="percentageFormatter">Gross Proceeds %</th>
+                </tr>
+                </thead>
+            </table>
+
+        </div>
+
+        <div id="divCreateSimulationWrapper" style="margin: 25px;">
+            <button id="btnCreateSimulationExpand" data-toggle="collapse" data-target="#divCreateSimulation" class="btn btn-warning">
+                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                Show Simulation Create
+            </button>
+            <div id="divCreateSimulation" class="collapse" style="margin-top: 25px;">
+                <div id="divCreateSimulationParameters" class="panel panel-warning float-left-panel" style="width: 600px;">
+                    <div class="panel-heading">Simulation Parameters</div>
+                    <div class="panel-body">
+                        <label for="txtSimulationDescription">Description:</label>&nbsp;<input id="txtSimulationDescription" class="input-large" /><br /><br />
+                        <label for="txtShares">Shares:</label>&nbsp;<input id="txtShares" value="100" class="input-xs" /><br />
+                        <label for="txtCommissionCost">Commission Cost:</label>&nbsp;<input id="txtCommissionCost" class="input-xs" value="5.99" /><br />
+                        <label for="txtMaxPurchasePrice">Max Purchase Price:</label>&nbsp;<input id="txtMaxPurchasePrice" class="input-xs" /><br />
+                        <label for="txtMinPurchasePrice">Min Purchase Price:</label>&nbsp;<input id="txtMinPurchasePrice" class="input-xs" /><br />
+                        <label for="ckSellOpenPositions">Sell Open Positions:</label>&nbsp;<input id="ckSellOpenPositions" type="checkbox" /><br />
+                    </div>
+                </div>
+
+                <div id="divCreateSimulationSymbols" class="panel panel-warning float-left-panel">
+                    <div class="panel-heading">Specific Symbols</div>
+                    <div class="panel-body float-panel">
+                        <textarea id="txtSimulationSymbols" style="width: 200px;"></textarea>
+                    </div>
+                </div>
+
+                <div id="divCreateMacdParameters" class="panel panel-warning float-left-panel">
+                    <div class="panel-heading">MACD Parameters</div>
+                    <div class="panel-body float-panel">
+                        <label for="ckMacdPositiveOnly">MACD Positive Only:</label>&nbsp;<input id="ckMacdPositiveOnly" type="checkbox" /><br />
+                        <label for="spanMacdShortPeriod">MACD Short Period:</label>&nbsp;<input id="txtMacdShortPeriod" class="input-xs" value="12" /><br />
+                        <label for="spanMacdLongPeriod">MACD Long Period:</label>&nbsp;<input id="txtMacdLongPeriod" class="input-xs" value="26" /><br />
+                    </div>
+                </div>
+
+                <div style="clear: both;">&nbsp;</div>
+                <div id="divSubmit">
+                    <button type="button" class="btn btn-primary" onclick="return createAndSubmitSimulation();">Create Simulation</button>
+                </div>
+
+            </div>
         </div>
     </div>
 
 </body>
+
 </html>

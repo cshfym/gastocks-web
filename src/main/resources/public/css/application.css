@@ -9,6 +9,11 @@
     background-color: #fff;
 }
 
+.div-controls {
+    margin-top: 50px;
+    margin-left: 25px;
+}
+
 .input-text { color: #000; }
 
 .input-xs    { width: 50px;  }

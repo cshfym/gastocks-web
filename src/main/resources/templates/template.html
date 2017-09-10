@@ -5,16 +5,44 @@
 <head>
     <meta charset="UTF-8"/>
     <title>GAStocks :: Web</title>
+
+    <th:block layout:fragment="scripts">
+        <script type="text/javascript" src="/js/jquery-3.2.1.min.js"></script>
+        <script type="text/javascript" src="/js/jquery-ui-1.12.1.min.js"></script>
+        <script type="text/javascript" src="/js/application.js"></script>
+        <script type="text/javascript" src="/js/bootstrap/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/js/bootstrap_table/bootstrap-table.min.js"></script>
+        <script type="text/javascript" src="/js/formatters.js"></script>
+    </th:block>
+
+    <th:block layout:fragment="stylesheets">
+        <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css" />
+        <link rel="stylesheet" href="/css/bootstrap_table/bootstrap-table.min.css" />
+        <link rel="stylesheet" href="/css/jquery-ui-1.12.1.min.css" />
+        <link rel="stylesheet" href="/css/application.css" />
+    </th:block>
+
 </head>
 
 <body>
 
-    <p>This is in the template</p>
-    <div layout:fragment="content">
-        Page content goes here
-    </div>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header navbar-brand">
+                GAStocks
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a th:href="@{/master}">Master</a></li>
+                    <li><a th:href="@{/simulation}">Simulation</a></li>
+                    <li><a th:href="@{/symbols}">Symbols</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-    <th:block layout:fragment="scripts">&nbsp;</th:block>
+    <div layout:fragment="content">Content</div>
 
 </body>
 

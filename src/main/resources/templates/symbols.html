@@ -1,35 +1,19 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      layout:decorator="template">
 <head>
     <title>GA Stocks Symbols</title>
-    <link rel="stylesheet" href="/css/application.css" />
-    <script type="text/javascript" src="/js/jquery-3.2.1.min.js"></script>
-    <script type="text/javascript" src="/js/jquery-ui-1.12.1.min.js"></script>
-    <script type="text/javascript" src="/js/application.js"></script>
-    <script type="text/javascript" src="/js/formatters.js"></script>
     <script type="text/javascript" src="/js/symbols.js"></script>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart']});
-    </script>
-
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css" />
-    <script type="text/javascript" src="/js/bootstrap/bootstrap.min.js"></script>
-
-    <!-- Bootstrap Table -->
-    <link rel="stylesheet" href="/css/bootstrap_table/bootstrap-table.min.css" />
-    <script type="text/javascript" src="/js/bootstrap_table/bootstrap-table.min.js"></script>
-
-    <link rel="stylesheet" href="/css/jquery-ui-1.12.1.min.css" />
 </head>
 
 <body>
 
-    <div id="divFullScreenWrap" class="full-screen-wrap-white">
+    <div id="divFullScreenWrap" layout:fragment="content" class="full-screen-wrap-white">
 
-        <div id="divControls">
+        <div id="divControls" class="div-controls">
             <label for="txtMin52WeekPrice">Min 52-Week Price:</label>&nbsp;<input id="txtMin52WeekPrice" class="input-xs" />&nbsp;&nbsp;
             <label for="txtMax52WeekPrice">Max 52-Week Price:</label>&nbsp;<input id="txtMax52WeekPrice" class="input-xs" />&nbsp;&nbsp;
             <button id="btnRefresh" class="btn btn-success" onclick="return loadSymbolDropDown();">Refresh</button>
@@ -63,4 +47,5 @@
     </div>
 
 </body>
+
 </html>
