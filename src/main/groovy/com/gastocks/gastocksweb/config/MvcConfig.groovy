@@ -16,6 +16,7 @@ class MvcConfig extends WebMvcConfigurerAdapter {
         registry.addViewController("/simulation").setViewName("simulation")
         registry.addViewController("/symbols").setViewName("symbols")
         registry.addViewController("/login").setViewName("login")
+        registry.addViewController("/thym").setViewName("thym")
     }
 
     @Override

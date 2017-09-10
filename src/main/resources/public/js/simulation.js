@@ -1,8 +1,4 @@
 
-var SERVER_URL = "http://localhost:9981/gastocks-server";
-var SIMULATIONS_PATH = "/simulations";
-var SIMULATION_SUMMARY_PATH = "/summary?compact=true"
-
 $(document).ready(function() {
     loadAvailableSimulationsDropDown();
     resetSimulationData();

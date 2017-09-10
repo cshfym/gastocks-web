@@ -11,11 +11,11 @@
 
 .input-text { color: #000; }
 
-.input-xs  { width: 50px;  }
-.input-sm  { width: 100px; }
-.input-med { width: 200px; }
+.input-xs    { width: 50px;  }
+.input-sm    { width: 100px; }
+.input-med   { width: 200px; }
 .input-large { width: 400px; }
-.input-xlg { width: 600px; }
+.input-xlg   { width: 600px; }
 
 .float-left-panel {
     float: left;

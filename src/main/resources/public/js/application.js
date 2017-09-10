@@ -2,7 +2,7 @@
 var SERVER_URL = "http://localhost:9981/gastocks-server";
 var SYMBOLS_PATH = "/symbols/vse";
 var SIMULATIONS_PATH = "/simulations";
-var SIMULATION_SUMMARY_PATH = "/summary"
+var SIMULATION_SUMMARY_PATH = "/summary?compact=true"
 var TRANSACTIONS_PATH = "/transactions";
 var TECHNICAL_QUOTE_PATH = "/technicalquote";
 
