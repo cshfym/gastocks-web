@@ -24,3 +24,7 @@ function percentageFormatter(value) {
         return '<span style="color: #3d7532;">' + value.toString() + '%</span>';
     }
 }
+
+function linkFormatter(value, row, index) {
+  return "<a href='" + YAHOO_FINANCE_URL + value + "/profile' target='_blank'>" + value + "</a>";
+}

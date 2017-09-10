@@ -153,11 +153,13 @@ function createAndSubmitSimulation() {
 
     if (!confirm("Submit simulation, are you sure?")) { return; }
 
+    var symbolList = $("#txtSimulationSymbols").val().split(",");
+
     var postData = {
         description: $("#txtSimulationDescription").val(),
         commissionPrice: $("#txtCommissionCost").val(),
         shares: $("#txtShares").val(),
-        symbols: [ ],
+        symbols: symbolList,
         maxPurchasePrice: $("#txtMaxPurchasePrice").val(),
         minPurchasePrice: $("#txtMinPurchasePrice").val(),
         sellOpenPositions: $("#ckSellOpenPositions").is(':checked') ? true : false,
