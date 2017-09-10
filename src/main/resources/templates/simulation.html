@@ -7,12 +7,6 @@
 
 <head>
     <title>GA Stocks Master :: Simulation</title>
-    <!--
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart']});
-    </script>
-    -->
     <script type="text/javascript" src="/js/simulation.js"></script>
 </head>
 
@@ -22,6 +16,7 @@
 
         <div id="divViewSimulationWrapper" class="full-screen-wrap-white">
 
+            <br/>
             <div id="divSimulationControls" class="div-controls">
                 <select id="ddlSimulationList" onchange="return loadSimulationData();">
                     <option>** Select Simulation **</option>
@@ -104,7 +99,7 @@
                 <div id="divCreateSimulationSymbols" class="panel panel-warning float-left-panel">
                     <div class="panel-heading">Specific Symbols</div>
                     <div class="panel-body float-panel">
-                        <textarea id="txtSimulationSymbols" style="width: 200px;"></textarea>
+                        <textarea id="txtSimulationSymbols" style="width: 250px; height: 250px;"></textarea>
                     </div>
                 </div>
 

@@ -1,5 +1,5 @@
 
-// var MAX_SYMBOLS_LOAD = 50;
+var loadedSymbolData = [];
 
 $(document).ready(function() {
     loadSymbolDropDown();
@@ -58,4 +58,27 @@ function setSymbolTableData(data) {
     $('#tblSymbols').bootstrapTable({
         data: data
     });
+
+    loadedSymbolData = data;
+}
+
+function promptCopySymbolList() {
+
+    var symbolList = buildSymbolList();
+
+    window.prompt("Copy to clipboard: Ctrl+C, Enter", symbolList);
+}
+
+function buildSymbolList() {
+
+    var symbolList = "";
+
+    $.each(loadedSymbolData, function(i, object) {
+        symbolList += object.symbol;
+        if (i < (loadedSymbolData.length - 1)) {
+            symbolList += ",";
+        }
+    });
+
+    return symbolList;
 }

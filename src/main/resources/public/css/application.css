@@ -27,3 +27,8 @@
     margin-left: 25px;
     width: 300px;
 }
+
+.js-copytextarea {
+    display: none;
+}
+

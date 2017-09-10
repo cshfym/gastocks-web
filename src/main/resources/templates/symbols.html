@@ -13,10 +13,12 @@
 
     <div id="divFullScreenWrap" layout:fragment="content" class="full-screen-wrap-white">
 
+        <br/>
         <div id="divControls" class="div-controls">
             <label for="txtMin52WeekPrice">Min 52-Week Price:</label>&nbsp;<input id="txtMin52WeekPrice" class="input-xs" />&nbsp;&nbsp;
             <label for="txtMax52WeekPrice">Max 52-Week Price:</label>&nbsp;<input id="txtMax52WeekPrice" class="input-xs" />&nbsp;&nbsp;
             <button id="btnRefresh" class="btn btn-success" onclick="return loadSymbolDropDown();">Refresh</button>
+            <button id="btnCopySymbolList" class="btn btn-info" onclick="promptCopySymbolList();">Copy Symbols</button>
         </div>
 
         <table id="tblSymbols"
