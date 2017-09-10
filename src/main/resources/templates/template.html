@@ -13,6 +13,7 @@
         <script type="text/javascript" src="/js/bootstrap/bootstrap.min.js"></script>
         <script type="text/javascript" src="/js/bootstrap_table/bootstrap-table.min.js"></script>
         <script type="text/javascript" src="/js/formatters.js"></script>
+        <script type="text/javascript" src="/js/ajax_loader.js"></script>
     </th:block>
 
     <th:block layout:fragment="stylesheets">
@@ -37,6 +38,9 @@
                     <li><a th:href="@{/master}">Master</a></li>
                     <li><a th:href="@{/simulation}">Simulation</a></li>
                     <li><a th:href="@{/symbols}">Symbols</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><div id="divLoading" class="btn link">Loading, please wait...</div></li>
                 </ul>
             </div>
         </div>

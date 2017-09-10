@@ -130,6 +130,28 @@ function ajaxBuildQuoteCharts(tradingDaysCount, simulationData, symbol) {
 
 function buildSimulationTable(data) {
 
+    var simulationTableData = [];
+
+    $.each(data, function(i, object) {
+
+        var netProceeds = Math.round(((object.shares * (object.sellPrice - object.purchasePrice)) - object.commission) * 100) / 100;
+
+        var simulationData = {
+            "number": i + 1,
+            "shares": object.shares,
+            "cost": object.shares * object.purchasePrice,
+            "net_proceeds": netProceeds,
+            "purchase_price": object.purchasePrice,
+            "purchase_date": object.purchaseDate,
+            "sell_price": object.sellPrice,
+            "sell_date": object.sellDate
+        };
+        simulationTableData.push(simulationData);
+    });
+
+    setSimulationTableData(simulationTableData);
+
+    /*
     var simulationTable = "<table>";
 
     simulationTable += "<tr><th>#</th><th>Shares</th><th>Net Proceeds</th><th>Purchase Price</th><th>Purchase Date</th>" +
@@ -148,7 +170,9 @@ function buildSimulationTable(data) {
         simulationTable += "</tr>";
     }
     simulationTable += "</table>"
-    $("#divSimulationData").html(simulationTable)
+    $("#divSimulationData").html(simulationTable);
+    */
+
 }
 
 function drawMACDChart(quoteData, simulationData, tradingDaysCount, emaShortDays, emaLongDays) {
@@ -426,4 +450,12 @@ function isQuoteDateWithinTransactionPeriod(simulationData, quoteDate) {
     }
 
     return false;
+}
+
+function setSimulationTableData(data) {
+
+    $('#tblSimulationData').bootstrapTable("load", data);
+    $('#tblSimulationData').bootstrapTable({
+        data: data
+    });
 }
