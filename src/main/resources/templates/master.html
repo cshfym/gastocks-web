@@ -71,17 +71,14 @@
             <!-- Nav tabs -->
             <ul class="nav nav-tabs" role="tablist">
                 <li role="presentation" class="active"><a href="#divQuoteChart" aria-controls="divQuoteChart" role="tab" data-toggle="tab" onclick="reloadChart();">Quote</a></li>
-                <li role="presentation"><a href="#divMacdChart" aria-controls="divMacdChart" role="tab" data-toggle="tab" onclick="reloadChart();">MACD</a></li>
                 <li role="presentation"><a href="#divSimulationData" aria-controls="divSimulationData" role="tab" data-toggle="tab">Simulation Data</a></li>
             </ul>
 
             <!-- Tab panes -->
             <div class="tab-content">
                 <div role="tabpanel" class="tab-pane active" id="divQuoteChart">
-                    <div id="quoteChartDiv" style="width: 100%; height: 700px;"></div>
-                </div>
-                <div role="tabpanel" class="tab-pane" id="divMacdChart">
-                    <div id="macdChartDiv" style="width: 100%; height: 700px;"></div>
+                    <div id="quoteChartDiv" style="width: 100%; height: 300px;"></div>
+                    <div id="macdChartDiv" style="width: 100%; height: 300px;"></div>
                 </div>
                 <div role="tabpanel" class="tab-pane" id="divSimulationData" style="width: 100%; height: 700px;">
                     <table id="tblSimulationData"
@@ -108,10 +105,6 @@
             </div>
 
         </div>
-
-        <form th:action="@{/logout}" method="post">
-            <input type="submit" value="Sign Out" class="btn btn-danger" />
-        </form>
 
     </div>
 

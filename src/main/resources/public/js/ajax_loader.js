@@ -11,11 +11,16 @@ $(document).ajaxComplete(function() {
   hideLoader();
 });
 
+$(document).ajaxError(function() {
+  hideLoader();
+});
 
 function showLoader() {
     $('#divLoading').show();
+    $("#overlay").show();
 }
 
 function hideLoader() {
     $('#divLoading').hide();
+    $("#overlay").hide();
 }

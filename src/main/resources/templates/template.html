@@ -27,24 +27,29 @@
 
 <body>
 
+    <div id="overlay"></div>
+
     <!-- Fixed navbar -->
-    <nav class="navbar navbar-default navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header navbar-brand">
-                GAStocks
+    <form th:action="@{/logout}" method="post">
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header navbar-brand">
+                    GAStocks
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a th:href="@{/master}">Master</a></li>
+                        <li><a th:href="@{/simulation}">Simulation</a></li>
+                        <li><a th:href="@{/symbols}">Symbols</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><div id="divLoading" class="btn link">Loading, please wait...</div></li>
+                        <li style="margin-top: 10px;"><input type="submit" value="Sign Out" class="btn btn-danger" /></li>
+                    </ul>
+                </div>
             </div>
-            <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a th:href="@{/master}">Master</a></li>
-                    <li><a th:href="@{/simulation}">Simulation</a></li>
-                    <li><a th:href="@{/symbols}">Symbols</a></li>
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    <li><div id="divLoading" class="btn link">Loading, please wait...</div></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+        </nav>
+    </form>
 
     <div layout:fragment="content">Content</div>
 
