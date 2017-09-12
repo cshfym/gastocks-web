@@ -108,6 +108,7 @@ function resetSimulationInputs() {
     $("#txtMinPurchasePrice").val("");
     $("#txtMacdShortPeriod").val("");
     $("#txtMacdLongPeriod").val("");
+    $("#txtSimulationSymbols").val("");
     $("#ckSellOpenPositions").attr('checked', false);
     $("#ckMacdPositiveOnly").attr('checked', false);
 }
