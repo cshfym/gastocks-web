@@ -19,3 +19,8 @@ function isNullOrUndefined(value) {
 
     return false;
 }
+
+function safeCheckBoolean(value) {
+    if (isNullOrUndefined(value)) { return false; }
+    return true;
+}
