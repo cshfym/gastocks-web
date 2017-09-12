@@ -1,6 +1,11 @@
 
 var YAHOO_FINANCE_URL = "https://finance.yahoo.com/quote/";
 
+function integerFormatter(value) {
+    var preformat = currencyFormatter(value);
+    return preformat.replace("$","").replace(".00","");
+}
+
 function currencyFormatter(value) {
 
     if ((typeof value == "undefined") || (isNaN(value))) {

@@ -85,6 +85,7 @@ function resetSimulationData() {
     $("#spanNetProceeds").html("");
     $("#spanGrossProceeds").html("");
     $("#spanTotalCommissionCost").html("");
+    $("#spanTotalTransactionCount").html("");
     $("#txtSimulationParameters").val("");
 
     $("#spanDescription").html("");
@@ -95,6 +96,7 @@ function resetSimulationData() {
     $("#spanMacdPositiveTrigger").html("");
     $("#spanMacdShortPeriod").html("");
     $("#spanMacdLongPeriod").html("");
+    $("#spanSellOpenPositions").html("");
 }
 
 function resetSimulationInputs() {
@@ -123,6 +125,7 @@ function setSummaryHeaderLabels(data) {
     $("#spanNetProceeds").html(currencyFormatter(data.netProceeds) + " (" + percentageFormatter(data.netProceedsPercentage) + ")");
     $("#spanGrossProceeds").html(currencyFormatter(data.grossProceeds) + " (" + percentageFormatter(data.grossProceedsPercentage) + ")");
     $("#spanTotalCommissionCost").html(currencyFormatter(data.totalCommissionCost));
+    $("#spanTotalTransactionCount").html(integerFormatter(data.transactionCount));
 }
 
 function setParameterLabels(data) {
@@ -133,14 +136,15 @@ function setParameterLabels(data) {
     $("#spanCommissionCost").html(currencyFormatter(parameterJson.commissionPrice));
     $("#spanMaxPurchasePrice").html(currencyFormatter(parameterJson.maxPurchasePrice));
     $("#spanMinPurchasePrice").html(currencyFormatter(parameterJson.minPurchasePrice));
-    $("#sellOpenPositions").html(parameterJson.sellOpenPositions);
+    $("#spanSellOpenPositions").html(parameterJson.sellOpenPositions.toString());
 }
 
 function setMacdParameterLabels(data) {
 
     var parameterJson = JSON.parse(data.attributes);
 
-    $("#spanMacdPositiveTrigger").html(parameterJson.macdParameters.macdPositiveTrigger);
+    var macdPositiveTrigger = parameterJson.macdParameters.macdPositiveTrigger;
+    $("#spanMacdPositiveTrigger").html(macdPositiveTrigger.toString());
     $("#spanMacdShortPeriod").html(parameterJson.macdParameters.macdShortPeriod);
     $("#spanMacdLongPeriod").html(parameterJson.macdParameters.macdLongPeriod);
 }
