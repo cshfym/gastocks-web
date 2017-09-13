@@ -150,29 +150,6 @@ function buildSimulationTable(data) {
     });
 
     setSimulationTableData(simulationTableData);
-
-    /*
-    var simulationTable = "<table>";
-
-    simulationTable += "<tr><th>#</th><th>Shares</th><th>Net Proceeds</th><th>Purchase Price</th><th>Purchase Date</th>" +
-        "<th>Sell Price</th><th>Sell Date</th></tr>";
-
-    for(var i = 0; i < data.length; i++) {
-        var netProceeds = Math.round(((data[i].shares * (data[i].sellPrice - data[i].purchasePrice)) - data[i].commission) * 100) / 100;
-        simulationTable += "<tr>";
-        simulationTable += "<td>" + (i + 1) + "</td>";
-        simulationTable += "<td>" + data[i].shares + "</td>";
-        simulationTable += "<td>" + netProceeds + "</td>";
-        simulationTable += "<td>" + data[i].purchasePrice + "</td>";
-        simulationTable += "<td>" + data[i].purchaseDate + "</td>";
-        simulationTable += "<td>" + data[i].sellPrice + "</td>";
-        simulationTable += "<td>" + data[i].sellDate + "</td>";
-        simulationTable += "</tr>";
-    }
-    simulationTable += "</table>"
-    $("#divSimulationData").html(simulationTable);
-    */
-
 }
 
 function drawMACDChart(quoteData, simulationData, tradingDaysCount, emaShortDays, emaLongDays) {
@@ -207,7 +184,7 @@ function drawMACDChart(quoteData, simulationData, tradingDaysCount, emaShortDays
         var quoteElement = [];
         quoteElement.push(quoteData[i].quoteDate); // Quote Date
 
-        quoteElement.push(quoteData[i].macd);
+        quoteElement.push(quoteData[i].macdParameters.macd);
         // Add BUY or SELL markers on quote line.
         var transactionType = quoteDateTransactionType(simulationData, quoteData[i].quoteDate);
         if ((transactionType == "BUY") || (transactionType == "SELL")) {
@@ -218,8 +195,8 @@ function drawMACDChart(quoteData, simulationData, tradingDaysCount, emaShortDays
             quoteElement.push(null);
         }
 
-        quoteElement.push(quoteData[i].macdSignalLine);
-        quoteElement.push(quoteData[i].macdHist);
+        quoteElement.push(quoteData[i].macdParameters.macdSignalLine);
+        quoteElement.push(quoteData[i].macdParameters.macdHist);
 
 
         visibleQuotes.push(quoteElement);
@@ -340,11 +317,11 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
         }
 
         // Averages
-        quoteElement.push(quoteData[i]._52WeekAverage);
+        quoteElement.push(quoteData[i].quoteMetadata._52WeekAverage);
 
         if (showEMA) {
-            quoteElement.push(quoteData[i].emaShort); // EMA Short
-            quoteElement.push(quoteData[i].emaLong); // EMA Long
+            quoteElement.push(quoteData[i].macdParameters.emaShort); // EMA Short
+            quoteElement.push(quoteData[i].macdParameters.emaLong); // EMA Long
         }
 
         visibleQuotes.push(quoteElement);
