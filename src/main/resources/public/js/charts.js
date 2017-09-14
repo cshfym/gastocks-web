@@ -103,26 +103,40 @@ function ajaxBuildAllCharts(tradingDaysCount) {
 
 function ajaxBuildQuoteCharts(tradingDaysCount, simulationData, symbol) {
 
-    var emaShortDays = $("#txtEMAShort").val();
-    var emaLongDays = $("#txtEMALong").val();
     var showEMA = $('#ckShowEMA').is(':checked');
 
-    var fullUrl = SERVER_URL + TECHNICAL_QUOTE_PATH + "/" +  symbol + "/" + emaShortDays + "/" + emaLongDays;
+    var emaShortDays = $("#txtEMAShort").val();
+    var emaLongDays = $("#txtEMALong").val();
+
+    var postData = {
+        macdRequestParameters: {
+            macdShortPeriod: emaShortDays,
+            macdLongPeriod: emaLongDays
+        },
+        rsiRequestParameters: {
+            interval: 14
+        }
+    };
+
+    var fullUrl = SERVER_URL + TECHNICAL_QUOTE_PATH + "/" +  symbol;
 
     $.ajax({
+        type: "POST",
         url: fullUrl,
-        cache: false,
+        contentType: "application/json",
+        dataType: "json",
+        data: JSON.stringify(postData),
         success: function(data) {
           if (data.length == 0) {
             alert("No data found!");
             return;
           }
-
           drawQuoteChart(data, simulationData, tradingDaysCount, showEMA, emaShortDays, emaLongDays);
           drawMACDChart(data, simulationData, tradingDaysCount, emaShortDays, emaLongDays);
+          drawRSIChart(data, simulationData, tradingDaysCount);
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
-             alert("Error calling /technicalquote with symbol [" + symbol + "]");
+             alert("Error calling /technicalquote with symbol [" + symbol + "] - " + errorThrown);
              return [];
          }
     });
@@ -206,7 +220,7 @@ function drawMACDChart(quoteData, simulationData, tradingDaysCount, emaShortDays
 
     dataTable.addRows(visibleQuotes);
 
-    var title = tradingDaysCount + " Days";
+    var title = tradingDaysCount + " Days MACD";
     if (tradingDaysCount == "99999") {
         title = "All Available"
     }
@@ -238,7 +252,7 @@ function drawMACDChart(quoteData, simulationData, tradingDaysCount, emaShortDays
         },
         seriesType: 'line',
         series: {
-            2: { type: 'bars' }
+            2: { targetAxisIndex: 0, type: 'bars' }
         },
         title: title,
         titleTextStyle: {
@@ -246,10 +260,12 @@ function drawMACDChart(quoteData, simulationData, tradingDaysCount, emaShortDays
             fontSize: 16
         },
         vAxis: {
-            format: 'currency',
-            fontSize: 12,
-            textStyle: {
-                color: '#e6e6e6'
+            0: {
+                format: 'currency',
+                fontSize: 12,
+                textStyle: {
+                    color: '#e6e6e6'
+                }
             }
         }
     };
@@ -334,7 +350,7 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
 
     dataTable.addRows(visibleQuotes);
 
-    var title = tradingDaysCount + " Days";
+    var title = tradingDaysCount + " Days Quotes";
     if (tradingDaysCount == "99999") {
         title = "All Available"
     }
@@ -356,7 +372,6 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
             textStyle: {
                 color: '#e6e6e6'
             }
-
         },
         isStacked: true,
         legend: {
@@ -367,11 +382,11 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
         },
         seriesType: 'line',
         series: {
-            0: { color: '#2286cc' },
-            1: { color: 'red' },
-            2: { color: '#cbd1d3', lineDashStyle: [2, 2] },
-            3: { color: 'yellow' },
-            4: { color: 'red' }
+            0: { color: '#2286cc' },                        // Price line
+            1: { color: 'red' },                            // Buy position
+            2: { color: '#cbd1d3', lineDashStyle: [2,2] },  // 52-Week average
+            3: { color: 'yellow' },                         // EMA short days
+            4: { color: 'red' }                             // EMA long days
         },
         title: title,
         titleTextStyle: {
@@ -379,17 +394,145 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
             fontSize: 16
         },
         vAxis: {
-            format: 'currency',
-            maxValue: maxPrice,
-            minValue: minPrice,
-            fontSize: 12,
-            textStyle: {
-                color: '#e6e6e6'
+            0: {
+                format: 'currency',
+                maxValue: maxPrice,
+                minValue: minPrice,
+                fontSize: 12,
+                textStyle: {
+                    color: '#e6e6e6'
+                }
             }
         }
     };
 
     var chart = new google.visualization.LineChart(document.getElementById('quoteChartDiv'));
+    chart.draw(dataTable, options);
+}
+
+function drawRSIChart(quoteData, simulationData, tradingDaysCount) {
+
+    var fromDate = Date.parse($("#txtFromDate").val());
+    var toDate = Date.parse($("#txtToDate").val());
+
+    var dataTable = new google.visualization.DataTable();
+    dataTable.addColumn('string', 'X');
+    dataTable.addColumn('number', 'RSI');
+    dataTable.addColumn({ type: 'string', role: 'annotation' });
+    dataTable.addColumn({ type: 'string', role: 'annotationText' });
+    dataTable.addColumn('number', 'BUY Position (Simulation)');
+    dataTable.addColumn({ type: 'boolean', role: 'emphasis' });
+    dataTable.addColumn('number', 'Overbought');
+    dataTable.addColumn('number', 'Oversold');
+
+    var visibleQuotes = [];
+
+    // Quotes come in descending in order
+
+    for (var i = 0; i < quoteData.length; i++) {
+
+        if (i >= tradingDaysCount) { continue; }
+
+        // Quote date fall within user-specified date window?
+        var quoteDate = Date.parse(quoteData[i].quoteDate);
+        if ((isNaN(fromDate) == false) && (isNaN(toDate) == false)) {
+            if ((quoteDate < fromDate) || (quoteDate > toDate)) {
+            continue;
+            }
+        }
+
+        var quoteElement = [];
+        quoteElement.push(quoteData[i].quoteDate); // Quote Date
+
+        quoteElement.push(quoteData[i].rsiParameters.relativeStrengthIndex);
+
+        /* Add BUY or SELL markers on quote line. */
+        var transactionType = quoteDateTransactionType(simulationData, quoteData[i].quoteDate);
+        if ((transactionType == "BUY") || (transactionType == "SELL")) {
+            quoteElement.push(transactionType);
+            quoteElement.push(transactionType + " - " + quoteData[i].quoteDate + " at $" + quoteData[i].price);
+        } else {
+            quoteElement.push(null);
+            quoteElement.push(null);
+        }
+
+        // Emphasize (thicker line) if the quote date is within a buy and sell transaction period.
+        if (isQuoteDateWithinTransactionPeriod(simulationData, quoteData[i].quoteDate)) {
+            quoteElement.push(quoteData[i].rsiParameters.relativeStrengthIndex);
+            quoteElement.push(true);
+        } else {
+            quoteElement.push(null);
+            quoteElement.push(false);
+        }
+
+        quoteElement.push(80); // Overbought line
+        quoteElement.push(20); // Oversold line
+
+        visibleQuotes.push(quoteElement);
+    }
+
+    visibleQuotes.reverse(); // Display ascending
+
+    dataTable.addRows(visibleQuotes);
+
+    var title = tradingDaysCount + " Days RSI";
+    if (tradingDaysCount == "99999") {
+        title = "All Available"
+    }
+
+    var options = {
+        backgroundColor: '#333333',
+        chartArea: {
+            width: '90%',
+            height: '80%'
+        },
+        colors: [
+            '#2286cc',      // RSI
+            'red',          // Overbought
+            'green',        // Oversold
+            'red'           // Buy position
+        ],
+        crosshair: {
+            trigger: 'both',
+            color: '#64f740',
+            opacity: 0.75
+        },
+        curveType: 'function',
+        fontSize: 12,
+        hAxis: {
+            textStyle: {
+                color: '#e6e6e6'
+            }
+        },
+        legend: {
+            textStyle: {
+                color: '#e6e6e6'
+            },
+            position: 'bottom'
+        },
+        seriesType: 'line',
+        series: {
+            // 2: { targetAxisIndex: 0, type: 'bars' }
+        },
+        title: title,
+        titleTextStyle: {
+            color: '#e6e6e6',
+            fontSize: 16
+        },
+        vAxis: {
+            0: {
+                format: '#',
+                maxValue: 100,
+                minValue: 0,
+                fontSize: 12,
+                textStyle: {
+                    color: '#e6e6e6'
+                }
+            }
+        }
+    };
+
+    var chart = new google.visualization.LineChart(document.getElementById('rsiChartDiv'));
     chart.draw(dataTable, options);
 }
 

@@ -33,7 +33,11 @@
                     <button id="btn60Days" onclick="return ajaxBuildAllCharts(60);" class="btn btn-primary">60 Days</button>
                     <button id="btn90Days" onclick="return ajaxBuildAllCharts(90);" class="btn btn-primary">90 Days</button>
                     <button id="btn180Days" onclick="return ajaxBuildAllCharts(180);" class="btn btn-primary">180 Days</button>
-                    <button id="btn365Days" onclick="return ajaxBuildAllCharts(365);" class="btn btn-primary">365 Days</button>
+                    <button id="btn1Year" onclick="return ajaxBuildAllCharts(365);" class="btn btn-primary">1 Year</button>
+                    <button id="btn2Years" onclick="return ajaxBuildAllCharts(730);" class="btn btn-primary">2 Years</button>
+                    <button id="btn3Years" onclick="return ajaxBuildAllCharts(1095);" class="btn btn-primary">3 Years</button>
+                    <button id="btn4Years" onclick="return ajaxBuildAllCharts(1460);" class="btn btn-primary">4 Years</button>
+                    <button id="btn5Years" onclick="return ajaxBuildAllCharts(1825);" class="btn btn-primary">5 Years</button>
                     <button id="btnAll"  class="btn btn-primary" onclick="return ajaxBuildAllCharts();">All</button>
                 </div>
                 <button id="btnAdvancedOptions" data-toggle="collapse" data-target="#divAdvancedOptions" class="btn btn-warning">Advanced Options</button>
@@ -77,8 +81,9 @@
             <!-- Tab panes -->
             <div class="tab-content">
                 <div role="tabpanel" class="tab-pane active" id="divQuoteChart">
-                    <div id="quoteChartDiv" style="width: 100%; height: 300px;"></div>
-                    <div id="macdChartDiv" style="width: 100%; height: 300px;"></div>
+                    <div id="quoteChartDiv" style="width: 100%; height: 400px;"></div>
+                    <div id="macdChartDiv" style="width: 100%; height: 400px;"></div>
+                    <div id="rsiChartDiv" style="width: 100%; height: 400px;"></div>
                 </div>
                 <div role="tabpanel" class="tab-pane" id="divSimulationData" style="width: 100%; height: 700px;">
                     <table id="tblSimulationData"
