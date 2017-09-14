@@ -176,6 +176,11 @@ function createAndSubmitSimulation() {
             macdShortPeriod: $("#txtMacdShortPeriod").val(),
             macdLongPeriod: $("#txtMacdLongPeriod").val(),
             macdPositiveTrigger: $('#ckMacdPositiveOnly').is(':checked') ? true : false
+        },
+        rsiRequestParameters: {
+            interval: $("#txtRsiPeriod").val(),
+            overBoughtLine: $("#txtRsiOverBoughtLine").val(),
+            overSoldLine: $("#txtRsiOverSoldLine").val()
         }
     };
 

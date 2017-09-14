@@ -166,114 +166,6 @@ function buildSimulationTable(data) {
     setSimulationTableData(simulationTableData);
 }
 
-function drawMACDChart(quoteData, simulationData, tradingDaysCount, emaShortDays, emaLongDays) {
-
-    var fromDate = Date.parse($("#txtFromDate").val());
-    var toDate = Date.parse($("#txtToDate").val());
-
-    var dataTable = new google.visualization.DataTable();
-    dataTable.addColumn('string', 'X');
-    dataTable.addColumn('number', 'MACD');
-    dataTable.addColumn({ type: 'string', role: 'annotation' });
-    dataTable.addColumn({ type: 'string', role: 'annotationText' });
-    dataTable.addColumn('number', 'Signal Line');
-    dataTable.addColumn('number', 'MACD Hist');
-
-    var visibleQuotes = [];
-
-    // Quotes come in descending in order
-
-    for (var i = 0; i < quoteData.length; i++) {
-
-        if (i >= tradingDaysCount) { continue; }
-
-        // Quote date fall within user-specified date window?
-        var quoteDate = Date.parse(quoteData[i].quoteDate);
-        if ((isNaN(fromDate) == false) && (isNaN(toDate) == false)) {
-            if ((quoteDate < fromDate) || (quoteDate > toDate)) {
-            continue;
-            }
-        }
-
-        var quoteElement = [];
-        quoteElement.push(quoteData[i].quoteDate); // Quote Date
-
-        quoteElement.push(quoteData[i].macdParameters.macd);
-        // Add BUY or SELL markers on quote line.
-        var transactionType = quoteDateTransactionType(simulationData, quoteData[i].quoteDate);
-        if ((transactionType == "BUY") || (transactionType == "SELL")) {
-            quoteElement.push(transactionType);
-            quoteElement.push(transactionType + " - " + quoteData[i].quoteDate + " at $" + quoteData[i].price);
-        } else {
-            quoteElement.push(null);
-            quoteElement.push(null);
-        }
-
-        quoteElement.push(quoteData[i].macdParameters.macdSignalLine);
-        quoteElement.push(quoteData[i].macdParameters.macdHist);
-
-
-        visibleQuotes.push(quoteElement);
-    }
-
-    visibleQuotes.reverse(); // Display ascending
-
-    dataTable.addRows(visibleQuotes);
-
-    var title = tradingDaysCount + " Days MACD";
-    if (tradingDaysCount == "99999") {
-        title = "All Available"
-    }
-
-    var options = {
-        backgroundColor: '#333333',
-        chartArea: {
-            width: '90%',
-            height: '80%'
-        },
-        colors: ['#2286cc','#b73337','yellow'],
-        crosshair: {
-            trigger: 'both',
-            color: '#64f740',
-            opacity: 0.75
-        },
-        curveType: $('#ckSmoothed').is(':checked') ? 'function' : 'none',
-        fontSize: 12,
-        hAxis: {
-            textStyle: {
-                color: '#e6e6e6'
-            }
-        },
-        legend: {
-            textStyle: {
-                color: '#e6e6e6'
-            },
-            position: 'bottom'
-        },
-        seriesType: 'line',
-        series: {
-            2: { targetAxisIndex: 0, type: 'bars' }
-        },
-        title: title,
-        titleTextStyle: {
-            color: '#e6e6e6',
-            fontSize: 16
-        },
-        vAxis: {
-            0: {
-                format: 'currency',
-                fontSize: 12,
-                textStyle: {
-                    color: '#e6e6e6'
-                }
-            }
-        }
-    };
-
-    var chart = new google.visualization.LineChart(document.getElementById('macdChartDiv'));
-    chart.draw(dataTable, options);
-}
-
 function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, emaShortDays, emaLongDays) {
 
     var fromDate = Date.parse($("#txtFromDate").val());
@@ -410,6 +302,114 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
     chart.draw(dataTable, options);
 }
 
+function drawMACDChart(quoteData, simulationData, tradingDaysCount, emaShortDays, emaLongDays) {
+
+    var fromDate = Date.parse($("#txtFromDate").val());
+    var toDate = Date.parse($("#txtToDate").val());
+
+    var dataTable = new google.visualization.DataTable();
+    dataTable.addColumn('string', 'X');
+    dataTable.addColumn('number', 'MACD');
+    dataTable.addColumn({ type: 'string', role: 'annotation' });
+    dataTable.addColumn({ type: 'string', role: 'annotationText' });
+    dataTable.addColumn('number', 'Signal Line');
+    dataTable.addColumn('number', 'MACD Hist');
+
+    var visibleQuotes = [];
+
+    // Quotes come in descending in order
+
+    for (var i = 0; i < quoteData.length; i++) {
+
+        if (i >= tradingDaysCount) { continue; }
+
+        // Quote date fall within user-specified date window?
+        var quoteDate = Date.parse(quoteData[i].quoteDate);
+        if ((isNaN(fromDate) == false) && (isNaN(toDate) == false)) {
+            if ((quoteDate < fromDate) || (quoteDate > toDate)) {
+            continue;
+            }
+        }
+
+        var quoteElement = [];
+        quoteElement.push(quoteData[i].quoteDate); // Quote Date
+
+        quoteElement.push(quoteData[i].macdParameters.macd);
+        // Add BUY or SELL markers on quote line.
+        var transactionType = quoteDateTransactionType(simulationData, quoteData[i].quoteDate);
+        if ((transactionType == "BUY") || (transactionType == "SELL")) {
+            quoteElement.push(transactionType);
+            quoteElement.push(transactionType + " - " + quoteData[i].quoteDate + " at $" + quoteData[i].price);
+        } else {
+            quoteElement.push(null);
+            quoteElement.push(null);
+        }
+
+        quoteElement.push(quoteData[i].macdParameters.macdSignalLine);
+        quoteElement.push(quoteData[i].macdParameters.macdHist);
+
+
+        visibleQuotes.push(quoteElement);
+    }
+
+    visibleQuotes.reverse(); // Display ascending
+
+    dataTable.addRows(visibleQuotes);
+
+    var title = tradingDaysCount + " Days MACD";
+    if (tradingDaysCount == "99999") {
+        title = "All Available"
+    }
+
+    var options = {
+        backgroundColor: '#333333',
+        chartArea: {
+            width: '90%',
+            height: '80%'
+        },
+        colors: ['#2286cc','#b73337','yellow'],
+        crosshair: {
+            trigger: 'both',
+            color: '#64f740',
+            opacity: 0.75
+        },
+        curveType: $('#ckSmoothed').is(':checked') ? 'function' : 'none',
+        fontSize: 12,
+        hAxis: {
+            textStyle: {
+                color: '#e6e6e6'
+            }
+        },
+        legend: {
+            textStyle: {
+                color: '#e6e6e6'
+            },
+            position: 'bottom'
+        },
+        seriesType: 'line',
+        series: {
+            2: { targetAxisIndex: 0, type: 'bars' }
+        },
+        title: title,
+        titleTextStyle: {
+            color: '#e6e6e6',
+            fontSize: 16
+        },
+        vAxis: {
+            0: {
+                format: 'currency',
+                fontSize: 12,
+                textStyle: {
+                    color: '#e6e6e6'
+                }
+            }
+        }
+    };
+
+    var chart = new google.visualization.LineChart(document.getElementById('macdChartDiv'));
+    chart.draw(dataTable, options);
+}
+
 function drawRSIChart(quoteData, simulationData, tradingDaysCount) {
 
     var fromDate = Date.parse($("#txtFromDate").val());
@@ -465,8 +465,8 @@ function drawRSIChart(quoteData, simulationData, tradingDaysCount) {
             quoteElement.push(false);
         }
 
-        quoteElement.push(80); // Overbought line
-        quoteElement.push(20); // Oversold line
+        quoteElement.push(75); // Overbought line
+        quoteElement.push(25); // Oversold line
 
         visibleQuotes.push(quoteElement);
     }
