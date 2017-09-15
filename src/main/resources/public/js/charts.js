@@ -1,4 +1,10 @@
 
+var quoteChart;
+var quoteChartDataTable;
+
+var chartSelectBeginDate = "";
+var chartSelectEndDate = "";
+
 $(document).ready(function() {
     console.log("Document ready!");
     loadAvailableSimulationsDropDown();
@@ -47,6 +53,12 @@ function loadAvailableSimulationsDropDown() {
 
 function reloadChart() {
     ajaxBuildAllCharts("Reload");
+}
+
+function resetDateFilter() {
+    $("#txtFromDate").val("");
+    $("#txtToDate").val("");
+    ajaxBuildAllCharts("Reload")
 }
 
 /**
@@ -173,18 +185,18 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
     var fromDate = Date.parse($("#txtFromDate").val());
     var toDate = Date.parse($("#txtToDate").val());
 
-    var dataTable = new google.visualization.DataTable();
-    dataTable.addColumn('string', 'X');
-    dataTable.addColumn('number', 'Closing Price');
-    dataTable.addColumn({ type: 'string', role: 'annotation' });
-    dataTable.addColumn({ type: 'string', role: 'annotationText' });
-    dataTable.addColumn('number', 'BUY Position (Simulation)');
-    dataTable.addColumn({ type: 'boolean', role: 'emphasis' });
-    dataTable.addColumn('number', '52-Week Average');
+    quoteChartDataTable = new google.visualization.DataTable();
+    quoteChartDataTable.addColumn('string', 'X');
+    quoteChartDataTable.addColumn('number', 'Closing Price');
+    quoteChartDataTable.addColumn({ type: 'string', role: 'annotation' });
+    quoteChartDataTable.addColumn({ type: 'string', role: 'annotationText' });
+    quoteChartDataTable.addColumn('number', 'BUY Position (Simulation)');
+    quoteChartDataTable.addColumn({ type: 'boolean', role: 'emphasis' });
+    quoteChartDataTable.addColumn('number', '52-Week Average');
 
     if (showEMA) {
-        dataTable.addColumn('number', 'EMA Short Days (' + emaShortDays + ')');
-        dataTable.addColumn('number', 'EMA Long Days (' + emaLongDays + ')');
+        quoteChartDataTable.addColumn('number', 'EMA Short Days (' + emaShortDays + ')');
+        quoteChartDataTable.addColumn('number', 'EMA Long Days (' + emaLongDays + ')');
     }
 
     var visibleQuotes = [];
@@ -242,7 +254,7 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
 
     visibleQuotes.reverse();
 
-    dataTable.addRows(visibleQuotes);
+    quoteChartDataTable.addRows(visibleQuotes);
 
     var title = tradingDaysCount + " Days Quotes";
     if (tradingDaysCount == "99999") {
@@ -300,9 +312,32 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
         }
     };
 
-    var chart = new google.visualization.LineChart(document.getElementById('quoteChartDiv'));
-    chart.draw(dataTable, options);
+    quoteChart = new google.visualization.LineChart(document.getElementById('quoteChartDiv'));
+
+    google.visualization.events.addListener(quoteChart, 'select', quoteChartSelectHandler);
+    quoteChart.draw(quoteChartDataTable, options);
 }
+
+function quoteChartSelectHandler() {
+
+    // quoteChart and quoteChartDataTable should not be null at this point.
+
+    var selectedItem = quoteChart.getSelection()[0];
+    if (selectedItem) {
+        var selectedValue = quoteChartDataTable.getValue(selectedItem.row, 0);
+        if (chartSelectBeginDate == "") {
+            chartSelectBeginDate = selectedValue;
+        } else {
+            chartSelectEndDate = selectedValue;
+            $("#txtFromDate").val(chartSelectBeginDate);
+            $("#txtToDate").val(chartSelectEndDate);
+            chartSelectBeginDate = "";
+            chartSelectEndDate = "";
+            reloadChart();
+        }
+    }
+}
+
 
 function drawMACDChart(quoteData, simulationData, tradingDaysCount, emaShortDays, emaLongDays) {
 
@@ -522,14 +557,16 @@ function drawRSIChart(quoteData, simulationData, tradingDaysCount) {
             fontSize: 16
         },
         vAxis: {
-            0: {
-                format: '#',
-                maxValue: 100,
-                minValue: 0,
-                fontSize: 12,
-                textStyle: {
-                    color: '#e6e6e6'
-                }
+            format: '#',
+            maxValue: 100,
+            minValue: 0,
+            viewWindow: {
+                min: 0,
+                max: 100
+            },
+            fontSize: 12,
+            textStyle: {
+                color: '#e6e6e6'
             }
         }
     };

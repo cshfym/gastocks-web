@@ -5,6 +5,12 @@ $(document).ready(function() {
 });
 
 function loadAvailableSimulationsDropDown() {
+
+    $("#ddlSimulationList").empty();
+
+    var selectOption = "<option value=default>** Select Simulation **</option>";
+    $(selectOption).appendTo("#ddlSimulationList");
+
     $.ajax({
         type: "GET",
         url: SERVER_URL + SIMULATIONS_PATH,
