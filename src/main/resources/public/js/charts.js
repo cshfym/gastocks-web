@@ -114,7 +114,9 @@ function ajaxBuildQuoteCharts(tradingDaysCount, simulationData, symbol) {
             macdLongPeriod: emaLongDays
         },
         rsiRequestParameters: {
-            interval: 14
+            interval: 14,
+            overBoughtLine: 70,
+            overSoldLine: 30
         }
     };
 
@@ -197,7 +199,7 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
         var quoteDate = Date.parse(quoteData[i].quoteDate);
         if ((isNaN(fromDate) == false) && (isNaN(toDate) == false)) {
             if ((quoteDate < fromDate) || (quoteDate > toDate)) {
-            continue;
+                continue;
             }
         }
 
@@ -465,8 +467,8 @@ function drawRSIChart(quoteData, simulationData, tradingDaysCount) {
             quoteElement.push(false);
         }
 
-        quoteElement.push(75); // Overbought line
-        quoteElement.push(25); // Oversold line
+        quoteElement.push(70); // Overbought line
+        quoteElement.push(30); // Oversold line
 
         visibleQuotes.push(quoteElement);
     }

@@ -178,7 +178,7 @@ function createAndSubmitSimulation() {
             macdPositiveTrigger: $('#ckMacdPositiveOnly').is(':checked') ? true : false
         },
         rsiRequestParameters: {
-            interval: $("#txtRsiPeriod").val(),
+            interval: $("#txtRsiInterval").val(),
             overBoughtLine: $("#txtRsiOverBoughtLine").val(),
             overSoldLine: $("#txtRsiOverSoldLine").val()
         }
