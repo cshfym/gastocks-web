@@ -94,7 +94,6 @@ function ajaxBuildAllCharts(tradingDaysCount) {
 
         $.ajax({
             url: fullUrl,
-            cache: false,
             success: function(data) {
                 if (data.length == 0) {
                     return [];
@@ -133,27 +132,43 @@ function ajaxBuildQuoteCharts(tradingDaysCount, simulationData, symbol) {
     };
 
     var fullUrl = SERVER_URL + TECHNICAL_QUOTE_PATH + "/" +  symbol;
+    var requestBody = JSON.stringify(postData);
 
     $.ajax({
         type: "POST",
         url: fullUrl,
         contentType: "application/json",
         dataType: "json",
-        data: JSON.stringify(postData),
-        success: function(data) {
-          if (data.length == 0) {
+        data: requestBody,
+        cache: true,
+        beforeSend: function () {
+            if (localCache.exists(fullUrl, requestBody)) {
+                var cacheData = localCache.get(fullUrl, requestBody);
+                drawAllCharts(cacheData, simulationData, tradingDaysCount, showEMA, emaShortDays, emaLongDays);
+                return false;
+            }
+            return true;
+        },
+        success: function(quoteData) {
+          if (quoteData.length == 0) {
             alert("No data found!");
             return;
           }
-          drawQuoteChart(data, simulationData, tradingDaysCount, showEMA, emaShortDays, emaLongDays);
-          drawMACDChart(data, simulationData, tradingDaysCount, emaShortDays, emaLongDays);
-          drawRSIChart(data, simulationData, tradingDaysCount);
+          localCache.set(fullUrl, requestBody, quoteData, null);
+          drawAllCharts(quoteData, simulationData, tradingDaysCount, showEMA, emaShortDays, emaLongDays);
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
              alert("Error calling /technicalquote with symbol [" + symbol + "] - " + errorThrown);
              return [];
          }
     });
+}
+
+function drawAllCharts(data, simulationData, tradingDaysCount, showEMA, emaShortDays, emaLongDays) {
+
+    drawQuoteChart(data, simulationData, tradingDaysCount, showEMA, emaShortDays, emaLongDays);
+    drawMACDChart(data, simulationData, tradingDaysCount, emaShortDays, emaLongDays);
+    drawRSIChart(data, simulationData, tradingDaysCount);
 }
 
 function buildSimulationTable(data) {
