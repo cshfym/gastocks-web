@@ -31,7 +31,7 @@ function registerSymbolAutoComplete() {
           });
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
-             alert("Error calling /symbols!");
+             alert("Error calling /symbols: " + errorThrown + ", textStatus: " + textStatus);
              return;
           }
     });
