@@ -75,6 +75,7 @@ function loadSimulationData() {
           setSimulationParameters(data);
           setParameterLabels(data);
           setMacdParameterLabels(data);
+          setRsiParameterLabels(data);
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
              alert("Error calling /simulation: " + errorThrown);
@@ -102,6 +103,9 @@ function resetSimulationData() {
     $("#spanMacdPositiveTrigger").html("");
     $("#spanMacdShortPeriod").html("");
     $("#spanMacdLongPeriod").html("");
+    $("#spanRsiInterval").html("");
+    $("#spanRsiOverBoughtLine").html("");
+    $("#spanRsiOverSoldLine").html("");
     $("#spanSellOpenPositions").html("");
     $("#spanOnlyTransactOnPriceChange").html("");
 }
@@ -157,6 +161,15 @@ function setMacdParameterLabels(data) {
     $("#spanMacdPositiveTrigger").html(macdPositiveTrigger.toString());
     $("#spanMacdShortPeriod").html(parameterJson.macdParameters.macdShortPeriod);
     $("#spanMacdLongPeriod").html(parameterJson.macdParameters.macdLongPeriod);
+}
+
+function setRsiParameterLabels(data) {
+
+    var parameterJson = JSON.parse(data.attributes);
+
+    $("#spanRsiInterval").html(parameterJson.rsiRequestParameters.interval);
+    $("#spanRsiOverBoughtLine").html(parameterJson.rsiRequestParameters.overBoughtLine);
+    $("#spanRsiOverSoldLine").html(parameterJson.rsiRequestParameters.overSoldLine);
 }
 
 function setSimulationParameters(data) {
