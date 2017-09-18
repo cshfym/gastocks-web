@@ -66,7 +66,8 @@ function loadSimulationData() {
                 "net_proceeds": simulationSummaries[i].netProceeds,
                 "net_proceeds_pct": simulationSummaries[i].netProceedsPercentage,
                 "gross_proceeds": simulationSummaries[i].grossProceeds,
-                "gross_proceeds_pct": simulationSummaries[i].grossProceedsPercentage
+                "gross_proceeds_pct": simulationSummaries[i].grossProceedsPercentage,
+                "invest_period_days": simulationSummaries[i].investmentPeriodDays
             };
             simulationData.push(symbolData);
           }
