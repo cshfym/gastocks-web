@@ -1,9 +1,14 @@
 
 var YAHOO_FINANCE_URL = "https://finance.yahoo.com/quote/";
 
+function safeIntegerFormatter(value) {
+    if (isNullOrUndefined(value)) { return "N/A"; }
+    return integerFormatter(value);
+}
+
 function integerFormatter(value) {
-    var preformat = currencyFormatter(value);
-    return preformat.replace("$","").replace(".00","");
+    var preFormat = currencyFormatter(value);
+    return preFormat.replace("$","").replace(".00","");
 }
 
 function currencyFormatter(value) {

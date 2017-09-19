@@ -101,6 +101,7 @@ function resetSimulationData() {
     $("#spanCommissionCost").html("");
     $("#spanMaxPurchasePrice").html("");
     $("#spanMinPurchasePrice").html("");
+    $("#spanMaxTradingPeriods").html("");
     $("#spanMacdPositiveTrigger").html("");
     $("#spanMacdShortPeriod").html("");
     $("#spanMacdLongPeriod").html("");
@@ -114,12 +115,13 @@ function resetSimulationData() {
 function resetSimulationInputs() {
 
     $("#txtSimulationDescription").val("");
-    $("#txtCommissionCost").val("");
-    $("#txtShares").val("");
-    $("#txtMaxPurchasePrice").val("");
-    $("#txtMinPurchasePrice").val("");
-    $("#txtMacdShortPeriod").val("");
-    $("#txtMacdLongPeriod").val("");
+    $("#txtCommissionCost").val("9.90");
+    $("#txtShares").val("100");
+    $("#txtMaxPurchasePrice").val("999");
+    $("#txtMinPurchasePrice").val("0");
+    $("#txtMaxTradingPeriods").val("");
+    $("#txtMacdShortPeriod").val("12");
+    $("#txtMacdLongPeriod").val("26");
     $("#txtSimulationSymbols").val("");
     $("#ckSellOpenPositions").attr('checked', false);
     $("#ckOnlyTransactOnPriceChange").attr('checked', true);
@@ -150,6 +152,7 @@ function setParameterLabels(data) {
     $("#spanCommissionCost").html(currencyFormatter(parameterJson.commissionPrice));
     $("#spanMaxPurchasePrice").html(currencyFormatter(parameterJson.maxPurchasePrice));
     $("#spanMinPurchasePrice").html(currencyFormatter(parameterJson.minPurchasePrice));
+    $("#spanMaxTradingPeriods").html(safeIntegerFormatter(parameterJson.maxTradingPeriods));
     $("#spanSellOpenPositions").html(parameterJson.sellOpenPositions.toString());
     $("#spanOnlyTransactOnPriceChange").html(safeCheckBoolean(parameterJson.onlyTransactOnPriceChange).toString());
 }
@@ -190,6 +193,7 @@ function createAndSubmitSimulation() {
         symbols: symbolList,
         maxPurchasePrice: $("#txtMaxPurchasePrice").val(),
         minPurchasePrice: $("#txtMinPurchasePrice").val(),
+        maxTradingPeriods: $("#txtMaxTradingPeriods").val(),
         sellOpenPositions: $("#ckSellOpenPositions").is(':checked') ? true : false,
         onlyTransactOnPriceChange: $("#ckOnlyTransactOnPriceChange").is(':checked') ? true : false,
         macdParameters: {

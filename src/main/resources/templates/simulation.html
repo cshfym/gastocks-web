@@ -41,6 +41,7 @@
                             <label for="txtCommissionCost">Commission Cost:</label>&nbsp;<input id="txtCommissionCost" class="input-xs" value="5.99" /><br />
                             <label for="txtMaxPurchasePrice">Max Purchase Price:</label>&nbsp;<input id="txtMaxPurchasePrice" class="input-xs" /><br />
                             <label for="txtMinPurchasePrice">Min Purchase Price:</label>&nbsp;<input id="txtMinPurchasePrice" class="input-xs" /><br />
+                            <label for="txtMaxTradingPeriods">Max Trading Periods:</label>&nbsp;<input id="txtMaxTradingPeriods" class="input-xs" /><br />
                             <label for="ckSellOpenPositions">Sell Open Positions:</label>&nbsp;<input id="ckSellOpenPositions" type="checkbox" /><br />
                             <label for="ckOnlyTransactOnPriceChange">Only Transact on Price Change:</label>&nbsp;<input id="ckOnlyTransactOnPriceChange" type="checkbox" /><br />
                         </div>
@@ -98,6 +99,7 @@
                     <label for="spanCommissionCost">Commission Cost:</label>&nbsp;<span id="spanCommissionCost"></span><br />
                     <label for="spanMaxPurchasePrice">Max Purchase Price:</label>&nbsp;<span id="spanMaxPurchasePrice"></span><br />
                     <label for="spanMinPurchasePrice">Min Purchase Price:</label>&nbsp;<span id="spanMinPurchasePrice"></span><br />
+                    <label for="spanMaxTradingPeriods">Max Trading Periods:</label>&nbsp;<span id="spanMaxTradingPeriods"></span><br />
                     <label for="spanSellOpenPositions">Sell Open Positions:</label>&nbsp;<span id="spanSellOpenPositions"></span><br />
                     <label for="spanOnlyTransactOnPriceChange">Only Transact on Price Change:</label>&nbsp;<span id="spanOnlyTransactOnPriceChange"></span><br />
                 </div>
@@ -137,7 +139,7 @@
                     <th data-field="net_proceeds_pct" data-sortable="true" data-formatter="percentageFormatter">Net Proceeds %</th>
                     <th data-field="gross_proceeds" data-sortable="true" data-formatter="currencyFormatter">Gross Proceeds</th>
                     <th data-field="gross_proceeds_pct" data-sortable="true" data-formatter="percentageFormatter">Gross Proceeds %</th>
-                    <th data-field="invest_period_days" data-sortable="true">Invest Period Days</th>
+                    <th data-field="invest_period_days" data-sortable="true">Trading Periods (i.e. Days)</th>
                 </tr>
                 </thead>
             </table>
