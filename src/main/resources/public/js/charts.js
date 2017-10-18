@@ -15,7 +15,7 @@ $(document).ready(function() {
 function registerSymbolAutoComplete() {
 
     $.ajax({
-        url: SERVER_URL + SYMBOLS_PATH,
+        url: SERVER_URL + SYMBOLS_VSE_PATH,
         cache: true,
         success: function(symbolData) {
           if (symbolData.length == 0) {

@@ -16,7 +16,7 @@ function loadSymbolDropDown() {
     }
 
     $.ajax({
-        url: SERVER_URL + SYMBOLS_PATH + OPTIONS,
+        url: SERVER_URL + SYMBOLS_VSE_PATH + OPTIONS,
         cache: true,
         success: function(symbolData) {
             if (symbolData.length == 0) {
@@ -33,12 +33,13 @@ function loadSymbolDropDown() {
                 var symbolData = {
                     "symbol": object.identifier,
                     "description": object.description,
-                    "exchange_market_short_name": object.exchangeMarketShortName,
                     "min_price": object.minPrice,
                     "max_price": object.maxPrice,
                     "avg_price": object.avgPrice,
                     "max_price_stdev": object.maxPriceStdev,
-                    "avg_price_stdev": object.avgPriceStdev
+                    "avg_price_stdev": object.avgPriceStdev,
+                    "sector": object.sector,
+                    "industry": object.industry
                 };
                 symbolTableData.push(symbolData);
             });
