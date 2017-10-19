@@ -169,6 +169,7 @@ function drawAllCharts(data, simulationData, tradingDaysCount, showEMA, emaShort
     drawQuoteChart(data, simulationData, tradingDaysCount, showEMA, emaShortDays, emaLongDays);
     drawMACDChart(data, simulationData, tradingDaysCount, emaShortDays, emaLongDays);
     drawRSIChart(data, simulationData, tradingDaysCount);
+    drawOBVChart(data, simulationData, tradingDaysCount);
 }
 
 function buildSimulationTable(data) {
@@ -587,6 +588,123 @@ function drawRSIChart(quoteData, simulationData, tradingDaysCount) {
     };
 
     var chart = new google.visualization.LineChart(document.getElementById('rsiChartDiv'));
+    chart.draw(dataTable, options);
+}
+
+function drawOBVChart(quoteData, simulationData, tradingDaysCount) {
+
+    var fromDate = Date.parse($("#txtFromDate").val());
+    var toDate = Date.parse($("#txtToDate").val());
+
+    var dataTable = new google.visualization.DataTable();
+    dataTable.addColumn('string', 'X');
+    dataTable.addColumn('number', 'OBV');
+    dataTable.addColumn({ type: 'string', role: 'annotation' });
+    dataTable.addColumn({ type: 'string', role: 'annotationText' });
+    dataTable.addColumn('number', 'BUY Position (Simulation)');
+    dataTable.addColumn({ type: 'boolean', role: 'emphasis' });
+
+    var visibleQuotes = [];
+
+    // Quotes come in descending in order
+
+    for (var i = 0; i < quoteData.length; i++) {
+
+        if (i >= tradingDaysCount) { continue; }
+
+        // Quote date fall within user-specified date window?
+        var quoteDate = Date.parse(quoteData[i].quoteDate);
+        if ((isNaN(fromDate) == false) && (isNaN(toDate) == false)) {
+            if ((quoteDate < fromDate) || (quoteDate > toDate)) {
+            continue;
+            }
+        }
+
+        var quoteElement = [];
+        quoteElement.push(quoteData[i].quoteDate); // Quote Date
+
+        quoteElement.push(quoteData[i].onBalanceVolumeData.onBalanceVolume);
+
+        /* Add BUY or SELL markers on quote line. */
+        var transactionType = quoteDateTransactionType(simulationData, quoteData[i].quoteDate);
+        if ((transactionType == "BUY") || (transactionType == "SELL")) {
+            quoteElement.push(transactionType);
+            quoteElement.push(transactionType + " - " + quoteData[i].quoteDate + " at $" + quoteData[i].price);
+        } else {
+            quoteElement.push(null);
+            quoteElement.push(null);
+        }
+
+        // Emphasize (thicker line) if the quote date is within a buy and sell transaction period.
+        if (isQuoteDateWithinTransactionPeriod(simulationData, quoteData[i].quoteDate)) {
+            quoteElement.push(quoteData[i].rsiParameters.relativeStrengthIndex);
+            quoteElement.push(true);
+        } else {
+            quoteElement.push(null);
+            quoteElement.push(false);
+        }
+
+        visibleQuotes.push(quoteElement);
+    }
+
+    visibleQuotes.reverse(); // Display ascending
+
+    dataTable.addRows(visibleQuotes);
+
+    var title = tradingDaysCount + " Days On-Balance Volume";
+    if (tradingDaysCount == "99999") {
+        title = "All Available"
+    }
+
+    var options = {
+        backgroundColor: '#333333',
+        chartArea: {
+            width: '90%',
+            height: '80%'
+        },
+        colors: [
+            '#2286cc',      // OBV
+            'red',          // Overbought
+            'green',        // Oversold
+            'red'           // Buy position
+        ],
+        crosshair: {
+            trigger: 'both',
+            color: '#64f740',
+            opacity: 0.75
+        },
+        curveType: 'function',
+        fontSize: 12,
+        hAxis: {
+            textStyle: {
+                color: '#e6e6e6'
+            }
+        },
+        legend: {
+            textStyle: {
+                color: '#e6e6e6'
+            },
+            position: 'bottom'
+        },
+        seriesType: 'line',
+        series: {
+            // 2: { targetAxisIndex: 0, type: 'bars' }
+        },
+        title: title,
+        titleTextStyle: {
+            color: '#e6e6e6',
+            fontSize: 16
+        },
+        vAxis: {
+            format: '#',
+            fontSize: 12,
+            textStyle: {
+                color: '#e6e6e6'
+            }
+        }
+    };
+
+    var chart = new google.visualization.LineChart(document.getElementById('obvChartDiv'));
     chart.draw(dataTable, options);
 }
 
