@@ -15,7 +15,7 @@ $(document).ready(function() {
 function registerSymbolAutoComplete() {
 
     $.ajax({
-        url: SERVER_URL + SYMBOLS_VSE_PATH,
+        url: SERVER_URL + SYMBOLS_PATH,
         cache: true,
         success: function(symbolData) {
           if (symbolData.length == 0) {
@@ -109,7 +109,6 @@ function ajaxBuildAllCharts(tradingDaysCount) {
 
     }
 
-
 }
 
 function ajaxBuildQuoteCharts(tradingDaysCount, simulationData, symbol) {
@@ -128,6 +127,10 @@ function ajaxBuildQuoteCharts(tradingDaysCount, simulationData, symbol) {
             interval: 14,
             overBoughtLine: 70,
             overSoldLine: 30
+        },
+        onBalanceVolumeRequestParameters: {
+            onBalanceVolumeShortPeriod: 12,
+            onBalanceVolumeLongPeriod: 26
         }
     };
 
@@ -140,7 +143,7 @@ function ajaxBuildQuoteCharts(tradingDaysCount, simulationData, symbol) {
         contentType: "application/json",
         dataType: "json",
         data: requestBody,
-        cache: true,
+        cache: false,
         beforeSend: function () {
             if (localCache.exists(fullUrl, requestBody)) {
                 var cacheData = localCache.get(fullUrl, requestBody);
@@ -598,7 +601,7 @@ function drawOBVChart(quoteData, simulationData, tradingDaysCount) {
 
     var dataTable = new google.visualization.DataTable();
     dataTable.addColumn('string', 'X');
-    dataTable.addColumn('number', 'OBV');
+    dataTable.addColumn('number', 'OBV (x1000)');
     dataTable.addColumn({ type: 'string', role: 'annotation' });
     dataTable.addColumn({ type: 'string', role: 'annotationText' });
     dataTable.addColumn('number', 'BUY Position (Simulation)');
