@@ -13,6 +13,8 @@ function loadSymbolDropDown() {
     var OPTIONS = "";
     if (!isNullOrUndefined(min52Weeks) && !isNullOrUndefined(max52Weeks)) {
         OPTIONS = "?minQuotePrice=" + min52Weeks + "&maxQuotePrice=" + max52Weeks;
+    } else {
+        OPTIONS = "?minQuotePrice=0&maxQuotePrice=9999999999.99";
     }
 
     $.ajax({
@@ -32,14 +34,15 @@ function loadSymbolDropDown() {
                 $(option).appendTo('#ddlSymbols');
                 var symbolData = {
                     "symbol": object.identifier,
-                    "description": object.description,
+                    "company_name": object.companyName,
                     "min_price": object.minPrice,
                     "max_price": object.maxPrice,
                     "avg_price": object.avgPrice,
                     "max_price_stdev": object.maxPriceStdev,
                     "avg_price_stdev": object.avgPriceStdev,
                     "sector": object.sector,
-                    "industry": object.industry
+                    "industry_category": object.industryCategory,
+                    "industry_sub_category": object.industrySubCategory
                 };
                 symbolTableData.push(symbolData);
             });
