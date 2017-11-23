@@ -10,16 +10,26 @@ function loadSymbolDropDown() {
     var min52Weeks = $("#txtMin52WeekPrice").val();
     var max52Weeks = $("#txtMax52WeekPrice").val();
 
-    var OPTIONS = "";
-    if (!isNullOrUndefined(min52Weeks) && !isNullOrUndefined(max52Weeks)) {
-        OPTIONS = "?minQuotePrice=" + min52Weeks + "&maxQuotePrice=" + max52Weeks;
-    } else {
-        OPTIONS = "?minQuotePrice=0&maxQuotePrice=9999999999.99";
-    }
+
+    if (isNullOrUndefined(min52Weeks)) { min52Weeks = 0; }
+    if (isNullOrUndefined(max52Weeks)) { max52Weeks = 9999999999.99; }
+
+    var postData = {
+        maxQuotePrice: max52Weeks,
+        minQuotePrice: min52Weeks,
+        sector: "Utilities",
+        industryCategory: "",
+        industrySubCategory: ""
+
+    };
 
     $.ajax({
-        url: SERVER_URL + SYMBOLS_VSE_PATH + OPTIONS,
-        cache: true,
+        type: "POST",
+        url: SERVER_URL + SYMBOLS_VSE_PATH,
+        cache: false,
+        contentType: "application/json",
+        dataType: "json",
+        data: JSON.stringify(postData),
         success: function(symbolData) {
             if (symbolData.length == 0) {
                 alert("No symbols found!");
