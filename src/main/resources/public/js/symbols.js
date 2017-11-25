@@ -92,7 +92,6 @@ function loadSymbolTable() {
         success: function(symbolData) {
             setSymbolTableData([]);
             if (symbolData.length == 0) {
-                alert("No symbols found!");
                 return;
             }
 
