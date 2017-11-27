@@ -6,6 +6,7 @@ var SIMULATIONS_PATH = "/simulations";
 var SIMULATION_SUMMARY_PATH = "/summary?compact=true"
 var TRANSACTIONS_PATH = "/transactions";
 var TECHNICAL_QUOTE_PATH = "/technicalquote";
+var SECTOR_PATH = "/sector"; // Used in technical quote for sector
 var SECTORS_PATH = "/sectors";
 var INDUSTRIES_PATH = "/industries";
 

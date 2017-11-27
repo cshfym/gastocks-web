@@ -54,13 +54,22 @@
                 </div>
 
                 <div id="divMACDOptions" style="margin-top: 25px;">
-                    <label for="txtEMAShort">EMA Short:</label><input id="txtEMAShort" value="12" style="width: 50px;" class="input-text" />
-                    <label for="txtEMALong">EMA Long:</label><input id="txtEMALong" value="26" style="width: 50px;" class="input-text" />
+                    <label for="txtEMAShort">EMA Short:</label>&nbsp;
+                    <input id="txtEMAShort" value="12" style="width: 50px;" class="input-text" />
+                    <label for="txtEMALong">EMA Long:</label>&nbsp;
+                    <input id="txtEMALong" value="26" style="width: 50px;" class="input-text" />
                 </div>
 
                 <div id="divChartingOptions">
-                    <label for="ckSmoothed">Smoothed:</label><input id="ckSmoothed" type="checkbox" value="Smooth Line" />
-                    <label for="ckShowEMA">Show EMA?</label>:&nbsp;<input id="ckShowEMA" type="checkbox" value="Smooth Line" />
+                    <label for="ckSmoothed">Smoothed:</label>&nbsp;
+                    <input id="ckSmoothed" type="checkbox" value="Smooth Line" />
+                    <label for="ckShowEMA">Show EMA?</label>:&nbsp;
+                    <input id="ckShowEMA" type="checkbox" value="Show EMA?" />
+                </div>
+
+                <div id="divSectorSelection">
+                    <label for="ckShowSector">Show Sector Average?</label>:&nbsp;
+                    <input id="ckShowSector" type="checkbox" value="Show Sector Average" onclick="return ajaxBuildAllCharts('Reload');" />
                 </div>
 
                 <div id="divSimulationOptions">

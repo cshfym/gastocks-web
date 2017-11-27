@@ -5,9 +5,12 @@ var quoteChartDataTable;
 var chartSelectBeginDate = "";
 var chartSelectEndDate = "";
 
+var noSectorSelection = "** Select Sector **";
+
 $(document).ready(function() {
     console.log("Document ready!");
     loadAvailableSimulationsDropDown();
+    // loadAvailableSectorsDropDown();
     registerSymbolAutoComplete();
     $("#hfDaysSelected").val("");
 });
@@ -51,6 +54,28 @@ function loadAvailableSimulationsDropDown() {
     });
 }
 
+/*
+function loadAvailableSectorsDropDown() {
+
+    $("#ddlSectorList").empty();
+
+    var selectOption = "<option value=default>" + noSectorSelection + "</option>";
+    $(selectOption).appendTo("#ddlSectorList");
+
+    $.ajax({
+        type: "GET",
+        url: SERVER_URL + SECTORS_PATH,
+        dataType: "json",
+        success: function (data) {
+            $.each(data, function(i, object) {
+                var option = "<option value=" + object.id + ">" + object.description + "</option>";
+                $(option).appendTo('#ddlSectorList');
+            });
+        }
+    });
+}
+*/
+
 function reloadChart() {
     ajaxBuildAllCharts("Reload");
 }
@@ -63,9 +88,9 @@ function resetDateFilter() {
 
 /**
  * Primary entrypoint for building all charts. Chains together multiple AJAX calls:
-   #1: Load simulation data.
-   #2: Load basic quote technical data.
-   #3: Load MACD quote data.
+   #: Load simulation data.
+   #: Load sector data.
+   #: Load basic quote technical data (includes MACD, RSI, OBV.
 **/
 function ajaxBuildAllCharts(tradingDaysCount) {
 
@@ -85,7 +110,7 @@ function ajaxBuildAllCharts(tradingDaysCount) {
 
     if (selectedSimulationId.startsWith("**")) {
         // Bypass simulation load, build charts.
-        ajaxBuildQuoteCharts(tradingDaysCount, null, symbol);
+        ajaxLoadSectorBySymbol(tradingDaysCount, null, symbol);
     } else {
 
         // Load simulation data, build charts.
@@ -94,24 +119,60 @@ function ajaxBuildAllCharts(tradingDaysCount) {
 
         $.ajax({
             url: fullUrl,
-            success: function(data) {
-                if (data.length == 0) {
-                    return [];
-                }
-                buildSimulationTable(data);
-                ajaxBuildQuoteCharts(tradingDaysCount, data, symbol);
+            success: function(simulationData) {
+                buildSimulationTable(simulationData);
+                ajaxLoadSectorBySymbol(tradingDaysCount, simulationData, symbol);
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-                alert("Error calling " + fullUrl + " with symbol [" + symbol + "]");
-                return [];
+                console.log("Error calling " + fullUrl + " with symbol [" + symbol + "]");
+                ajaxLoadSectorBySymbol(tradingDaysCount, [], symbol);
              }
         });
 
     }
-
 }
 
-function ajaxBuildQuoteCharts(tradingDaysCount, simulationData, symbol) {
+function ajaxLoadSectorBySymbol(tradingDaysCount, simulationData, symbol) {
+
+    var fullUrl = SERVER_URL + SECTORS_PATH + "/" +  symbol;
+
+    $.ajax({
+        type: "GET",
+        url: fullUrl,
+        contentType: "application/json",
+        dataType: "json",
+        cache: false,
+        success: function(sector) {
+            ajaxLoadSectorChart(sector, tradingDaysCount, simulationData, symbol);
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            console.log("Error calling " + fullUrl + " with sector [" + selectedSector + "] - " + errorThrown);
+            ajaxBuildQuoteCharts([], tradingDaysCount, simulationData, symbol);
+        }
+    });
+}
+
+function ajaxLoadSectorChart(sector, tradingDaysCount, simulationData, symbol) {
+
+    var fullUrl = SERVER_URL + TECHNICAL_QUOTE_PATH + "/" + SECTOR_PATH + "/" +  sector.description;
+
+    $.ajax({
+        type: "GET",
+        url: fullUrl,
+        contentType: "application/json",
+        dataType: "json",
+        cache: false,
+        success: function(sectorQuoteData) {
+          ajaxBuildQuoteCharts(sectorQuoteData, tradingDaysCount, null, symbol);
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+             console.log("Error calling " + fullUrl + " with sector [" + selectedSector + "] - " + errorThrown);
+             ajaxBuildQuoteCharts([], tradingDaysCount, [], symbol);
+         }
+    });
+}
+
+function ajaxBuildQuoteCharts(sectorQuoteData, tradingDaysCount, simulationData, symbol) {
 
     var showEMA = $('#ckShowEMA').is(':checked');
 
@@ -147,7 +208,7 @@ function ajaxBuildQuoteCharts(tradingDaysCount, simulationData, symbol) {
         beforeSend: function () {
             if (localCache.exists(fullUrl, requestBody)) {
                 var cacheData = localCache.get(fullUrl, requestBody);
-                drawAllCharts(cacheData, simulationData, tradingDaysCount, showEMA, emaShortDays, emaLongDays);
+                drawAllCharts(cacheData, sectorQuoteData, simulationData, tradingDaysCount, showEMA, emaShortDays, emaLongDays);
                 return false;
             }
             return true;
@@ -158,7 +219,7 @@ function ajaxBuildQuoteCharts(tradingDaysCount, simulationData, symbol) {
             return;
           }
           localCache.set(fullUrl, requestBody, quoteData, null);
-          drawAllCharts(quoteData, simulationData, tradingDaysCount, showEMA, emaShortDays, emaLongDays);
+          drawAllCharts(quoteData, sectorQuoteData, simulationData, tradingDaysCount, showEMA, emaShortDays, emaLongDays);
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
              alert("Error calling /technicalquote with symbol [" + symbol + "] - " + errorThrown);
@@ -167,9 +228,9 @@ function ajaxBuildQuoteCharts(tradingDaysCount, simulationData, symbol) {
     });
 }
 
-function drawAllCharts(data, simulationData, tradingDaysCount, showEMA, emaShortDays, emaLongDays) {
+function drawAllCharts(data, sectorQuoteData, simulationData, tradingDaysCount, showEMA, emaShortDays, emaLongDays) {
 
-    drawQuoteChart(data, simulationData, tradingDaysCount, showEMA, emaShortDays, emaLongDays);
+    drawQuoteChart(data, sectorQuoteData, simulationData, tradingDaysCount, showEMA, emaShortDays, emaLongDays);
     drawMACDChart(data, simulationData, tradingDaysCount, emaShortDays, emaLongDays);
     drawRSIChart(data, simulationData, tradingDaysCount);
     drawOBVChart(data, simulationData, tradingDaysCount);
@@ -199,7 +260,7 @@ function buildSimulationTable(data) {
     setSimulationTableData(simulationTableData);
 }
 
-function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, emaShortDays, emaLongDays) {
+function drawQuoteChart(quoteData, sectorQuoteData, simulationData, tradingDaysCount, showEMA, emaShortDays, emaLongDays) {
 
     var fromDate = Date.parse($("#txtFromDate").val());
     var toDate = Date.parse($("#txtToDate").val());
@@ -212,6 +273,7 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
     quoteChartDataTable.addColumn('number', 'BUY Position (Simulation)');
     quoteChartDataTable.addColumn({ type: 'boolean', role: 'emphasis' });
     quoteChartDataTable.addColumn('number', '52-Week Average');
+    quoteChartDataTable.addColumn('number', 'Sector Average');
 
     if (showEMA) {
         quoteChartDataTable.addColumn('number', 'EMA Short Days (' + emaShortDays + ')');
@@ -260,6 +322,19 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
         // Averages
         quoteElement.push(quoteData[i].quoteMetadata._52WeekAverage);
 
+        // Display the sector quote value
+        var showSector = $('#ckShowSector').is(':checked');
+        if (showSector) {
+            var sectorQuoteForDate = getSectorQuoteForQuoteDate(sectorQuoteData, quoteDate)
+            if (sectorQuoteForDate != null) {
+                quoteElement.push(sectorQuoteForDate.price);
+            } else {
+                quoteElement.push(null);
+            }
+        } else {
+            quoteElement.push(null);
+        }
+
         if (showEMA) {
             quoteElement.push(quoteData[i].macdParameters.emaShort); // EMA Short
             quoteElement.push(quoteData[i].macdParameters.emaLong); // EMA Long
@@ -307,11 +382,12 @@ function drawQuoteChart(quoteData, simulationData, tradingDaysCount, showEMA, em
         },
         seriesType: 'line',
         series: {
-            0: { color: '#2286cc' },                        // Price line
+            0: { color: '#2286cc' },                        // Price quote line
             1: { color: 'red' },                            // Buy position
             2: { color: '#cbd1d3', lineDashStyle: [2,2] },  // 52-Week average
-            3: { color: 'yellow' },                         // EMA short days
-            4: { color: 'red' }                             // EMA long days
+            3: { color: 'orange' },                          // Sector quote line
+            4: { color: 'yellow' },                         // EMA short days
+            5: { color: 'red' }                             // EMA long days
         },
         title: title,
         titleTextStyle: {
@@ -356,7 +432,6 @@ function quoteChartSelectHandler() {
         }
     }
 }
-
 
 function drawMACDChart(quoteData, simulationData, tradingDaysCount, emaShortDays, emaLongDays) {
 
@@ -745,6 +820,22 @@ function isQuoteDateWithinTransactionPeriod(simulationData, quoteDate) {
     }
 
     return false;
+}
+
+function getSectorQuoteForQuoteDate(sectorQuoteData, quoteDate) {
+
+    if (sectorQuoteData == null) { return null; }
+
+    var quoteDateObj = new Date(quoteDate);
+
+    for (var i = 0; i < sectorQuoteData.length; i++) {
+        var sectorQuoteDate = new Date(sectorQuoteData[i].quoteDate);
+        if (quoteDateObj.getTime() == sectorQuoteDate.getTime()) {
+            return sectorQuoteData[i];
+        }
+    }
+
+    return null;
 }
 
 function setSimulationTableData(data) {
