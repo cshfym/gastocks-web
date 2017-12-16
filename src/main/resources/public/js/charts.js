@@ -192,6 +192,12 @@ function ajaxBuildQuoteCharts(sectorQuoteData, tradingDaysCount, simulationData,
         onBalanceVolumeRequestParameters: {
             onBalanceVolumeShortPeriod: 12,
             onBalanceVolumeLongPeriod: 26
+        },
+        emvRequestParameters: {
+          	periods: 14,
+          	boxRatio: 1000000.0,
+          	volumeTriggerPercentage: 1.25,
+            highLowTriggerPercentage: 1.50
         }
     };
 
@@ -234,6 +240,8 @@ function drawAllCharts(data, sectorQuoteData, simulationData, tradingDaysCount, 
     drawMACDChart(data, simulationData, tradingDaysCount, emaShortDays, emaLongDays);
     drawRSIChart(data, simulationData, tradingDaysCount);
     drawOBVChart(data, simulationData, tradingDaysCount);
+    drawEMVChart(data, simulationData, tradingDaysCount);
+    drawVolumeChart(data, simulationData, tradingDaysCount);
 }
 
 function buildSimulationTable(data) {
@@ -478,7 +486,6 @@ function drawMACDChart(quoteData, simulationData, tradingDaysCount, emaShortDays
 
         quoteElement.push(quoteData[i].macdParameters.macdSignalLine);
         quoteElement.push(quoteData[i].macdParameters.macdHist);
-
 
         visibleQuotes.push(quoteElement);
     }
@@ -783,6 +790,231 @@ function drawOBVChart(quoteData, simulationData, tradingDaysCount) {
     };
 
     var chart = new google.visualization.LineChart(document.getElementById('obvChartDiv'));
+    chart.draw(dataTable, options);
+}
+
+function drawEMVChart(quoteData, simulationData, tradingDaysCount) {
+
+    var fromDate = Date.parse($("#txtFromDate").val());
+    var toDate = Date.parse($("#txtToDate").val());
+
+    var dataTable = new google.visualization.DataTable();
+    dataTable.addColumn('string', 'X');
+    dataTable.addColumn('number', 'EMV (14-Day)');
+    dataTable.addColumn('number', 'Easy Movement');
+    dataTable.addColumn('number', 'Difficult Movement');
+    dataTable.addColumn({ type: 'string', role: 'annotation' });
+    dataTable.addColumn({ type: 'string', role: 'annotationText' });
+
+    var visibleQuotes = [];
+
+    // Quotes come in descending in order
+
+    for (var i = 0; i < quoteData.length; i++) {
+
+        if (i >= tradingDaysCount) { continue; }
+
+        // Quote date fall within user-specified date window?
+        var quoteDate = Date.parse(quoteData[i].quoteDate);
+        if ((isNaN(fromDate) == false) && (isNaN(toDate) == false)) {
+            if ((quoteDate < fromDate) || (quoteDate > toDate)) {
+            continue;
+            }
+        }
+
+        var quoteElement = [];
+        quoteElement.push(quoteData[i].quoteDate); // Quote Date
+
+        quoteElement.push(quoteData[i].emvTechnicalData.easeOfMovementSMA);
+
+        // Easy movement indicators
+        if (quoteData[i].emvTechnicalData.easyMovement) {
+            quoteElement.push(quoteData[i].emvTechnicalData.easeOfMovementSMA);
+        } else {
+            quoteElement.push(null);
+        }
+
+        // Difficult movement indicators
+        if (quoteData[i].emvTechnicalData.difficultMovement) {
+            quoteElement.push(quoteData[i].emvTechnicalData.easeOfMovementSMA);
+        } else {
+            quoteElement.push(null);
+        }
+
+        // Add BUY or SELL markers on quote line.
+        var transactionType = quoteDateTransactionType(simulationData, quoteData[i].quoteDate);
+        if ((transactionType == "BUY") || (transactionType == "SELL")) {
+            quoteElement.push(transactionType);
+            quoteElement.push(transactionType + " - " + quoteData[i].quoteDate + " at $" + quoteData[i].price);
+        } else {
+            quoteElement.push(null);
+            quoteElement.push(null);
+        }
+
+        visibleQuotes.push(quoteElement);
+    }
+
+    visibleQuotes.reverse(); // Display ascending
+
+    dataTable.addRows(visibleQuotes);
+
+    var title = tradingDaysCount + " Days EMV";
+    if (tradingDaysCount == "99999") {
+        title = "All Available"
+    }
+
+    var options = {
+        backgroundColor: '#333333',
+        chartArea: {
+            width: '90%',
+            height: '80%'
+        },
+        colors: ['#2286cc','#b73337'],
+        crosshair: {
+            trigger: 'both',
+            color: '#64f740',
+            opacity: 0.75
+        },
+        curveType: 'function',
+        fontSize: 12,
+        hAxis: {
+            textStyle: {
+                color: '#e6e6e6'
+            }
+        },
+        legend: {
+            textStyle: {
+                color: '#e6e6e6'
+            },
+            position: 'bottom'
+        },
+        seriesType: 'line',
+        series: {
+            0: { targetAxisIndex: 0, type: 'line' },
+            1: { // Easy movement
+                pointShape: 'circle',
+                pointSize: 10,
+                color: 'green'
+            },
+            2: { // Difficult movement
+                pointShape: 'circle',
+                pointSize: 10,
+                color: 'red'
+            }
+        },
+        title: title,
+        titleTextStyle: {
+            color: '#e6e6e6',
+            fontSize: 16
+        },
+        vAxes: {
+            0: {
+                fontSize: 12,
+                textStyle: {
+                    color: '#e6e6e6'
+                }
+            }
+        }
+    };
+
+    var chart = new google.visualization.LineChart(document.getElementById('emvChartDiv'));
+    chart.draw(dataTable, options);
+}
+
+function drawVolumeChart(quoteData, simulationData, tradingDaysCount) {
+
+    var fromDate = Date.parse($("#txtFromDate").val());
+    var toDate = Date.parse($("#txtToDate").val());
+
+    var dataTable = new google.visualization.DataTable();
+    dataTable.addColumn('string', 'X');
+    dataTable.addColumn('number', 'Volume');
+    dataTable.addColumn({ type: 'string', role: 'annotation' });
+    dataTable.addColumn({ type: 'string', role: 'annotationText' });
+
+    var visibleQuotes = [];
+
+    // Quotes come in descending in order
+
+    for (var i = 0; i < quoteData.length; i++) {
+
+        if (i >= tradingDaysCount) { continue; }
+
+        // Quote date fall within user-specified date window?
+        var quoteDate = Date.parse(quoteData[i].quoteDate);
+        if ((isNaN(fromDate) == false) && (isNaN(toDate) == false)) {
+            if ((quoteDate < fromDate) || (quoteDate > toDate)) {
+            continue;
+            }
+        }
+
+        var quoteElement = [];
+        quoteElement.push(quoteData[i].quoteDate); // Quote Date
+
+        quoteElement.push(quoteData[i].volume);
+
+        // Add BUY or SELL markers on quote line.
+        var transactionType = quoteDateTransactionType(simulationData, quoteData[i].quoteDate);
+        if ((transactionType == "BUY") || (transactionType == "SELL")) {
+            quoteElement.push(transactionType);
+            quoteElement.push(transactionType + " - " + quoteData[i].quoteDate + " at $" + quoteData[i].price);
+        } else {
+            quoteElement.push(null);
+            quoteElement.push(null);
+        }
+
+        visibleQuotes.push(quoteElement);
+    }
+
+    visibleQuotes.reverse(); // Display ascending
+
+    dataTable.addRows(visibleQuotes);
+
+    var title = tradingDaysCount + " Days - Volume";
+    if (tradingDaysCount == "99999") {
+        title = "All Available"
+    }
+
+    var options = {
+        backgroundColor: '#333333',
+        chartArea: {
+            width: '90%',
+            height: '80%'
+        },
+        colors: ['#2286cc','#b73337'],
+        crosshair: {
+            trigger: 'both',
+            color: '#64f740',
+            opacity: 0.75
+        },
+        curveType: $('#ckSmoothed').is(':checked') ? 'function' : 'none',
+        fontSize: 12,
+        hAxis: {
+            textStyle: {
+                color: '#e6e6e6'
+            }
+        },
+        legend: {
+            textStyle: {
+                color: '#e6e6e6'
+            },
+            position: 'bottom'
+        },
+        seriesType: 'line',
+        series: {
+            0: { targetAxisIndex: 0, type: 'bars' }
+        },
+        title: title,
+        titleTextStyle: {
+            color: '#e6e6e6',
+            fontSize: 16
+        },
+        vAxes: {
+            0: { fontSize: 12 }
+        }
+    };
+
+    var chart = new google.visualization.LineChart(document.getElementById('volumeChartDiv'));
     chart.draw(dataTable, options);
 }
 
